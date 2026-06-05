@@ -12,7 +12,7 @@ class User(UserMixin, db.Model):
     whatsapp_number = db.Column(db.String(20), nullable=True)
     password = db.Column(db.String(200), nullable=False)
     role = db.Column(db.String(20), nullable=False)  # admin / staff / trekker
-    status = db.Column(db.String(20), default='active')  # Active / Inactive / Banned
+    status = db.Column(db.String(20), default='active')  # Active / Blacklisted
     created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
     updated_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc), onupdate=lambda: datetime.now(timezone.utc))
 

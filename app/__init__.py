@@ -2,6 +2,9 @@ from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
 from config import Config
+from app.admin_routes import admin as admin_blueprint
+from app.staff_routes import staff as staff_blueprint
+from app.user_routes import user as user_blueprint
 
 db = SQLAlchemy()
 login_manager = LoginManager()
@@ -28,6 +31,10 @@ def create_app():
         db.create_all()  # Create database tables if they don't exist
         create_admin()  # Create default admin user if not exists
 
+    app.register_blueprint(admin_blueprint)
+    app.register_blueprint(staff_blueprint) 
+    app.register_blueprint(user_blueprint)
+
     return app
 
 def create_admin():
@@ -39,7 +46,7 @@ def create_admin():
         admin_user = User(
             name='Admin User',
             email="admin@tma.com",
-            password=generate_password_hash('admin123', method='sha256'),
+            password=generate_password_hash('admin123'),
             role='admin',
             status='active'
         )
