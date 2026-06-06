@@ -2,9 +2,7 @@ from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
 from config import Config
-from app.admin_routes import admin as admin_blueprint
-from app.staff_routes import staff as staff_blueprint
-from app.user_routes import user as user_blueprint
+
 
 db = SQLAlchemy()
 login_manager = LoginManager()
@@ -30,6 +28,11 @@ def create_app():
     with app.app_context():
         db.create_all()  # Create database tables if they don't exist
         create_admin()  # Create default admin user if not exists
+
+    # calling blueprints after app context is set up to avoid calling loop
+    from app.admin_routes import admin as admin_blueprint
+    from app.staff_routes import staff as staff_blueprint
+    from app.user_routes import user as user_blueprint
 
     app.register_blueprint(admin_blueprint)
     app.register_blueprint(staff_blueprint) 

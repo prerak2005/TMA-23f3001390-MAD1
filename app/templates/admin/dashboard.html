@@ -1,5 +1,74 @@
 {% extends 'base.html' %}
+
+{% block title %}Admin Dashboard{% endblock %}
+
 {% block content %}
-<h2>Admin Dashboard</h2>
-<p>Welcome, {{ current_user.name }}!</p>
+<div class="container-fluid mt-5">
+    <h1 class="mb-4">Admin Dashboard</h1>
+
+    <!-- Stats Row -->
+     <div class="row mb-4">
+        <!-- Total Users Card -->
+        <div class="col-md-3">
+            <div class="card border-primary shadow-sm">
+                <div class="card-body">
+                    <h6 class="card-title">Total Users</h6>
+                    <h2 class="card-text text-primary">{{ stats.total_users }}</h2>
+                    <p class="card-text text-muted small">Registered users</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Total Staff Card -->
+        <div class="col-md-3 mb-4">
+            <div class="card border-success shadow-sm">
+                <div class="card-body">
+                    <h6 class="card-title text-muted">Total Staff</h6>
+                    <h2 class="card-text text-success">{{ stats.total_staff }}</h2>
+                    <p class="text-muted small">Trek Leaders</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Total Treks Card -->
+        <div class="col-md-3 mb-4">
+            <div class="card border-info shadow-sm">
+                <div class="card-body">
+                    <h6 class="card-title text-muted">Total Treks</h6>
+                    <h2 class="card-text text-info">{{ stats.total_treks }}</h2>
+                    <p class="text-muted small">All trekking expeditions</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Total Bookings Card -->
+        <div class="col-md-3 mb-4">
+            <div class="card border-warning shadow-sm">
+                <div class="card-body">
+                    <h6 class="card-title text-muted">Total Bookings</h6>
+                    <h2 class="card-text text-warning">{{ stats.total_bookings }}</h2>
+                    <p class="text-muted small">Completed bookings</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Pending Actions -->
+        {% if stats.pending_staff > 0 %}
+        <div class="alert alert-warning alert-dismissible fade show" role="alert">
+            <strong>Pending Approvals:</strong> {{ stats.pending_staff }} staff member(s) awaiting approval.
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        {% endif %}
+
+        <!-- Quick Links-->
+        <div class="row mt-5">
+            <div class="col-md-12">
+                <h5 class="mb-3">Quick Actions</h5>
+                <a href="#" class="btn btn-primary btn-sm">Manage Treks</a>
+                <a href="#" class="btn btn-success btn-sm">Manage Staff</a>
+                <a href="#" class="btn btn-info btn-sm">Manage Users</a>
+                <a href="#" class="btn btn-warning btn-sm">View Bookings</a>
+            </div>
+        </div>
+    </div>
 {% endblock %}
