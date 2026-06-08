@@ -108,3 +108,32 @@ def create_trek():
     
     # Get request shows form
     return render_template('admin/create_trek.html')
+
+
+@admin.route('/treks')
+@login_required
+def manage_treks():
+    '''View all treks with options to approve, edit, or delete'''
+
+    search_query = request.args.get('search', '').strip()
+
+    if search_query:
+        # Search by name or location(case-insensitive)
+        treks = Trek.query.filter(
+            db.or_(
+                Trek.name.ilike(f'%{search_query}%'),
+                Trek.location.ilike(f'%{search_query}%')
+            )
+        ).all()
+        search_message = f'Found {len(treks)} trek(s) matching "{search_query}"'
+    else:
+        # Get all treks, sorted by creation date(newest first)
+        treks = Trek.query.order_by(Trek.created_at.desc()).all()
+        search_message = None
+
+    return render_template(
+        'admin/manage_treks.html',
+        treks=treks,
+        search_query=search_query,
+        search_message=search_message
+    )
