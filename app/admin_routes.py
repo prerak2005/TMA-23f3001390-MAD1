@@ -137,3 +137,86 @@ def manage_treks():
         search_query=search_query,
         search_message=search_message
     )
+
+
+@admin.route('/trek/<int:trek_id>/edit', methods=['GET', 'POST'])
+@login_required
+def edit_trek(trek_id):
+    '''Edit an exsisting trek'''
+
+    trek = Trek.query.get_or_404(trek_id)
+
+    if request.method == 'POST':
+        try:
+            # Get form data
+            name = request.form.get('name', '').strip()
+            location = request.form.get('location', '').strip()
+            difficulty = request.form.get('difficulty', '').strip()
+            duration = request.form.get('duration', '').strip()
+            total_slots = request.form.get('total_slots', '').strip()
+            start_date = request.form.get('start_date', '').strip()
+            end_date = request.form.get('end_date', '').strip()
+
+            # Validation
+            if not all([name, location, difficulty, duration, total_slots, start_date, end_date]):
+                flash('All fields are required.', 'danger')
+                return redirect(url_for('admin.edit_trek', trek_id=trek_id))
+            
+            # Validate numeric fields
+            try:
+                duration = float(duration)
+                total_slots = int(total_slots)
+            except ValueError:
+                flash('Duration must be a number and Total Slots must be an integer.', 'danger')
+                return redirect(url_for('admin.edit_trek', trek_id=trek_id))
+            
+            # Validate difficulty
+            valid_difficulties = ['Easy', 'Moderate', 'Hard', 'Extreme']
+            if difficulty not in valid_difficulties:
+                flash(f'Difficulty must be one of: {", ".join(valid_difficulties)}', 'danger')
+                return redirect(url_for('admin.edit_trek', trek_id=trek_id))
+            
+            # Parse dates
+            try:
+                start_date = datetime.strptime(start_date, '%Y-%m-%d').date()
+                end_date = datetime.strptime(end_date, '%Y-%m-%d').date()
+            except ValueError:
+                flash('Invalid date format. Use YYYY-MM-DD.', 'danger')
+                return redirect(url_for('admin.edit_trek', trek_id=trek_id))
+            
+            # Validate date logic
+            if start_date >= end_date:
+                flash('Start date must be before end date.', 'danger')
+                return redirect(url_for('admin.edit_trek', trek_id=trek_id))
+            
+            # Validate total_slots doesn't go below available_slots already booked
+            booked_slots = trek.total_slots - trek.available_slots
+            if total_slots < booked_slots:
+                flash(f'Cannot reduce slots to {total_slots}. Already {booked_slots} slot(s) booked!', 'danger')
+                return redirect(url_for('admin.edit_trek', trek_id=trek_id))
+            
+            # Update trek 
+            trek.name = name
+            trek.location = location
+            trek.difficulty = difficulty
+            trek.duration = duration
+            trek.start_date = start_date
+            trek.end_date = end_date
+
+            # Adjust available_slots if total_slots changed
+            slots_difference = total_slots - trek.total_slots
+            trek.total_slots = total_slots
+            trek.available_slots += slots_difference  # Increase or decrease available slots based on total_slots change
+
+            db.session.commit()
+
+            flash(f'Trek "{name}" updated successfully!', 'success')
+            return redirect(url_for('admin.manage_treks'))
+        
+        except Exception as e:
+            db.session.rollback()
+            flash(f'Error updating trek: {str(e)}', 'danger')
+            return redirect(url_for('admin.edit_trek', trek_id=trek_id))
+        
+    # GET request - show form with existing data
+    return render_template('admin/edit_trek.html', trek=trek)
