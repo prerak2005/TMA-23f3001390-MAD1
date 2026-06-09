@@ -220,3 +220,36 @@ def edit_trek(trek_id):
         
     # GET request - show form with existing data
     return render_template('admin/edit_trek.html', trek=trek)
+
+
+@admin.route('/trek/<int:trek_id>/delete-confirm', methods=['GET', 'POST'])
+@login_required
+def delete_trek_confirm(trek_id):
+    '''show confirmation page before deleting trek'''
+
+    trek = Trek.query.get_or_404(trek_id)
+
+    if request.method == 'POST':
+
+        try:
+            # check if trek has active booking
+            active_bookings = Booking.query.filter_by(trek_id=trek_id).count()
+
+            if active_bookings > 0:
+                flash(f'Cannot delete trek with {active_bookings} active booking(s)!', 'danger')
+                return redirect(url_for('admin.manage_treks'))
+            
+            #delete trek
+            db.session.delete(trek)
+            db.session.commit()
+
+            flash(f'Trek "{trek.name}" deleted successfully!', 'success')
+            return redirect(url_for('admin.manage_treks'))
+        
+        except Exception as e:
+            db.session.rollback()
+            flash(f'Error deleting trek: {str(e)}', 'danger')
+            return redirect(url_for('admin.manage_treks'))
+        
+    # GET request - show confirmation page
+    return render_template('admin/delete_trek_confirm.html', trek=trek)
