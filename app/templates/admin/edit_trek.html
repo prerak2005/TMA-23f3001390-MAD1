@@ -1,0 +1,124 @@
+{% extends "base.html" %}
+
+{% block title %}Edit Trek - Admin{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow">
+                <div class="card-header bg-warning text-dark">
+                    <h4 class="mb-0">Edit Trek: {{ trek.name }}</h4>
+                </div>
+
+                <div class="card-body p-4">
+                    <form method="POST" action="{{url_for('admin.edit_trek', trek_id=trek.id)}}" novalidate>
+
+                        <!-- Trek Name -->
+                         <div class="mb-3">
+                            <label for="name" class="form-label">Trek Name<span class=text-danger>*</span></label>
+                            <input
+                                 type="text"
+                                class="form-control" 
+                                id="name" 
+                                name="name" 
+                                value="{{ trek.name }}" 
+                                placeholder="e.g., Everest Base Camp Trek"
+                                required>
+                         </div>
+
+                         <!-- Location -->
+                          <div class="mb-3">
+                            <label for="location" class="form-label">Location<span class="text-danger">*</span></label>
+                            <input
+                                 type="text"
+                                class="form-control" 
+                                id="location" 
+                                name="location" 
+                                value="{{ trek.location }}" 
+                                placeholder="e.g., Nepal, Himalayas"
+                                required>
+                          </div>
+                         
+                         <!-- Difficulty & Duration -->
+                          <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="difficulty" class="form-label">Difficulty Level <span class="text-danger">*</span></label>
+                                <select class="form-select" id="difficulty" name="difficulty" required>
+                                    <option value="">-- Select --</option>
+                                    <option value="Easy" {% if trek.difficulty == 'Easy' %}selected{% endif %}>Easy</option>
+                                    <option value="Moderate" {% if trek.difficulty == 'Moderate' %}selected{% endif %}>Moderate</option>
+                                    <option value="Hard" {% if trek.difficulty == 'Hard' %}selected{% endif %}>Hard</option>
+                                    <option value="Extreme" {% if trek.difficulty == 'Extreme' %}selected{% endif %}>Extreme</option>
+                                </select>
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label for="duration" class="form-label">Duration(days)<span class="text-danger">*</span></label>
+                                <input
+                                    type="number"
+                                    step="0.5"
+                                    class="form-control"
+                                    id="duration"
+                                    name="duration"
+                                    value="{{ trek.duration }}"
+                                    placeholder="e.g., 7"
+                                    required>
+                            </div>
+
+                            <!-- Dates -->
+                             <div class="col-md-6 mb-3">
+                                <label for="start_date" class="form-label">Start Date<span class="text-danger">*</span>*</label>
+                                <input
+                                    type="date"
+                                    class="form-control"
+                                    id="start_date"
+                                    name="start_date"
+                                    value="{{ trek.start_date.strftime('%Y-%m-%d') }}"
+                                    required>
+                             </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label for="end_date" class="form-label">End Date <span class="text-danger">*</span></label>
+                                <input 
+                                    type="date" 
+                                    class="form-control" 
+                                    id="end_date" 
+                                    name="end_date"
+                                    value="{{ trek.end_date.strftime('%Y-%m-%d') }}"
+                                    required
+                                >
+                            </div>
+                        </div>
+                        
+                        <!-- Total Slots -->
+                        <div class="mb-4">
+                            <label for="total_slots" class="form-label">Total Slots Available <span class="text-danger">*</span></label>
+                            <input 
+                                type="number" 
+                                class="form-control" 
+                                id="total_slots" 
+                                name="total_slots" 
+                                value="{{ trek.total_slots }}"
+                                placeholder="e.g., 20"
+                                min="1"
+                                required
+                            >
+                            <small class="form-text text-muted">
+                                Current bookings: {{ trek.total_slots - trek.available_slots }}
+                                <br>Currently available: {{ trek.available_slots }}
+                            </small>
+                        </div>
+                        
+                        <!-- Form Actions -->
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                            <a href="{{ url_for('admin.manage_treks') }}" class="btn btn-secondary">Cancel</a>
+                            <button type="submit" class="btn btn-warning">Update Trek</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
