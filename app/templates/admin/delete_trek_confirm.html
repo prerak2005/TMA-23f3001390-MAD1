@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+
+{% block title %}Delete Trek - Confirmation{% endblock %}
+
+{% block content %}
+<div class="conatiner mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card border-danger shadow">
+                <div class="card-header bg-danger text-white">
+                    <h4 class="mb-0">Delete Trek - Confirmation Required</h4>
+                </div>
+
+                <div class="card-body p-4">
+                    <div class="alert alert-danger mb-4">
+                        <strong>Warning!</strong> This action cannot be undone.
+                        Please review the trek details below before confirming deletion.
+                    </div>
+
+                    <!-- Trek Details -->
+                     <div class="trek-details mb-4">
+                        <table class="table table-sm">
+                            <tr>
+                                <td><strong>Trek Name:</strong></td>
+                                <td>{{ trek.name }}</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Location:</strong></td>
+                                <td>{{ trek.location }}</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Difficulty:</strong></td>
+                                <td>{{ trek.difficulty  }}</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Duration:</strong></td>
+                                <td>{{ trek.duration  }}</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Start Date:</strong></td>
+                                <td>{{ trek.start_date.strftime('%d-%m-%Y') }}</td>
+                            </tr>
+                            <tr>
+                                <td><strong>End Date:</strong></td>
+                                <td>{{ trek.end_date.strftime('%d-%m-%Y') }}</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Total Slots:</strong></td>
+                                <td>{{ trek.total_slots }}</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Status:</strong></td>
+                                <td>{{ trek.status  }}</td>
+                            </tr>
+                        </table>
+                     </div>
+
+                     <!-- Confirmation Form -->
+                      <form method="POST" action="{{ url_for('admin.delete_trek_confirm', trek_id=trek.id) }}">
+                        <div class="form-check mb-3">
+                            <input
+                            class="form-check-input"
+                            type="checkbox"
+                            id="confirm_delete"
+                            name="confirm-delete"
+                            required>
+                            <label class="form-check-label" for="confirm_delete">
+                                I understand this trek will be permanently removed.
+                            </label>
+                        </div>
+
+                        <!-- Action Buttons -->
+                         <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                            <a href="{{ url_for('admin.manage_treks') }}" class="btn btn-secondary">Cancel</a>
+                            <button type="submit" class="btn btn-danger">Confirm Delete</button>
+                         </div>
+                      </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
