@@ -2,7 +2,7 @@ from flask import Blueprint, render_template, request, redirect, url_for, flash
 from flask_login import login_required
 from app.models import User, Trek, Booking, StaffProfile
 from app import db
-from datetime import datetime
+from datetime import datetime, timezone
 
 admin = Blueprint('admin', __name__, url_prefix='/admin')
 
@@ -18,7 +18,7 @@ def dashboard():
     total_bookings = Booking.query.count()
 
     # pending staff approvals
-    pending_staff = User.query.filter_by(role='staff', status='pending').count()
+    pending_staff = StaffProfile.query.filter_by(status='pending').count()
 
     # pending trekk approvals
     # pending_treks = Trek.query.filter_by(status='Pending').count()
@@ -253,3 +253,113 @@ def delete_trek_confirm(trek_id):
         
     # GET request - show confirmation page
     return render_template('admin/delete_trek_confirm.html', trek=trek)
+
+
+# STAFF MANAGEMENT ROUTES
+@admin.route('/staff/pending')
+@login_required
+def view_pending_staff():
+    '''
+    Display staff members pending approval.
+ 
+    We query StaffProfile where status='pending', then get the linked User
+    for display info (name, email, contact).
+
+    '''
+    # Get all StaffProfiles where approval is still pending
+    pending_profiles = StaffProfile.query.filter_by(status='pending').all()
+ 
+    return render_template('admin/pending_staff.html', pending_profiles=pending_profiles)
+
+
+@admin.route('/staff/approve/<int:user_id>', methods=['POST'])
+@login_required
+def approve_staff(user_id):
+    '''
+    Approve a pending staff member.
+ 
+    Process:
+    1. Get staff user by ID (404 if not found)
+    2. Get their StaffProfile
+    3. Check StaffProfile.status is 'pending' (safety check)
+    4. Set StaffProfile.status = 'approved'
+    5. Set StaffProfile.approved_by_admin = True
+    6. Update StaffProfile.updated_at timestamp
+    7. Commit and redirect with success message
+ 
+    Note: User.status stays 'active' — we never touch it here.
+    The login check will use StaffProfile.status to allow/block staff login.
+    '''
+    staff_user = User.query.get_or_404(user_id)
+    staff_profile = StaffProfile.query.filter_by(user_id=user_id).first()
+ 
+    # Safety check — profile must exist and be pending
+    if not staff_profile or staff_profile.status != 'pending':
+        flash(f'{staff_user.name} is not pending approval.', 'warning')
+        return redirect(url_for('admin.view_pending_staff'))
+ 
+    # Update StaffProfile only
+    staff_profile.status = 'approved'
+    staff_profile.approved_by_admin = True
+    staff_profile.updated_at = datetime.now(timezone.utc)
+ 
+    try:
+        db.session.commit()
+        flash(f'{staff_user.name} has been approved as Trek Staff!', 'success')
+    except Exception as e:
+        db.session.rollback()
+        flash(f'Error approving staff: {str(e)}', 'danger')
+ 
+    return redirect(url_for('admin.view_pending_staff'))
+
+
+@admin.route('/staff/reject/<int:user_id>', methods=['POST'])
+@login_required
+def reject_staff(user_id):
+    '''
+    Reject a pending staff member.
+ 
+    Process:
+    1. Get staff user by ID (404 if not found)
+    2. Get their StaffProfile
+    3. Check StaffProfile.status is 'pending' (safety check)
+    4. Set StaffProfile.status = 'rejected'
+    5. Update StaffProfile.updated_at timestamp
+    6. Commit and redirect with info message
+ 
+    '''
+    staff_user = User.query.get_or_404(user_id)
+    staff_profile = StaffProfile.query.filter_by(user_id=user_id).first()
+ 
+    # Safety check — profile must exist and be pending
+    if not staff_profile or staff_profile.status != 'pending':
+        flash(f'{staff_user.name} is not pending approval.', 'warning')
+        return redirect(url_for('admin.view_pending_staff'))
+ 
+    # Update StaffProfile only 
+    staff_profile.status = 'rejected'
+    staff_profile.updated_at = datetime.now(timezone.utc)
+ 
+    try:
+        db.session.commit()
+        flash(f'{staff_user.name} application has been rejected.', 'info')
+    except Exception as e:
+        db.session.rollback()
+        flash(f'Error rejecting staff: {str(e)}', 'danger')
+ 
+    return redirect(url_for('admin.view_pending_staff'))
+
+
+@admin.route('/staff/all')
+@login_required
+def view_all_staff():
+    '''
+    Display all staff members regardless of approval status.
+ 
+    We query all StaffProfiles and join with User data for display.
+    Groups shown: approved, pending, rejected — all in one table with badges.
+
+    '''
+    all_profiles = StaffProfile.query.all()
+ 
+    return render_template('admin/view_all_staff.html', all_profiles=all_profiles)
