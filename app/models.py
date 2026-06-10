@@ -61,7 +61,7 @@ class StaffProfile(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
     specialization = db.Column(db.String(150), nullable=True)
     experience = db.Column(db.Integer, default=0)  # years
-    status = db.Column(db.String(20), default='Inactive')  # Active / Inactive / Blacklisted
+    status = db.Column(db.String(20), default='Pending')  # Approved / Rejected / Blacklisted / Pending
     approved_by_admin = db.Column(db.Boolean, default=False)
     created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
     updated_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc), onupdate=lambda: datetime.now(timezone.utc))
