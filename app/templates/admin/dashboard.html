@@ -56,21 +56,52 @@
         {% if stats.pending_staff > 0 %}
         <div class="alert alert-warning alert-dismissible fade show" role="alert">
             <strong>Pending Approvals:</strong> {{ stats.pending_staff }} staff member(s) awaiting approval.
+             <a href="{{ url_for('admin.view_pending_staff') }}" class="alert-link">Review Now →</a>
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
         {% endif %}
 
-        <!-- Quick Links-->
-        <div class="row mt-5">
-            <div class="col-md-12">
-                <h5 class="mb-3">Quick Actions</h5>
-                <a href="{{ url_for('admin.manage_treks') }}" class="btn btn-primary btn-sm">Manage Treks</a>
-                <a href="#" class="btn btn-success btn-sm">Manage Staff</a>
-                <a href="#" class="btn btn-info btn-sm">Manage Users</a>
-                <a href="#" class="btn btn-warning btn-sm">View Bookings</a>
-                <a href="{{ url_for('admin.create_trek') }}" class="btn btn-primary btn-sm">Create Trek</a>
-
+        <!-- Quick Links Section -->
+    <div class="row mt-5">
+        <div class="col-md-12">
+            <h5 class="mb-3">Quick Actions</h5>
+ 
+            <!-- Trek Management Buttons -->
+            <div class="mb-3">
+                <h6 class="text-muted">Trek Management</h6>
+                <a href="{{ url_for('admin.manage_treks') }}" class="btn btn-primary btn-sm">
+                    <i class="bi bi-mountain"></i> Manage Treks
+                </a>
+                <a href="{{ url_for('admin.create_trek') }}" class="btn btn-success btn-sm">
+                    <i class="bi bi-plus-circle"></i> Create Trek
+                </a>
+            </div>
+ 
+            <!-- Staff Management Buttons -->
+            <div class="mb-3">
+                <h6 class="text-muted">Staff Management</h6>
+                <a href="{{ url_for('admin.view_pending_staff') }}" class="btn btn-warning btn-sm">
+                    <i class="bi bi-clock-history"></i> Pending Approvals
+                    {% if stats.pending_staff > 0 %}
+                        <span class="badge bg-danger">{{ stats.pending_staff }}</span>
+                    {% endif %}
+                </a>
+                <a href="{{ url_for('admin.view_all_staff') }}" class="btn btn-info btn-sm">
+                    <i class="bi bi-people"></i> View All Staff
+                </a>
+            </div>
+ 
+            <!-- Future Management Buttons -->
+            <div class="mb-3">
+                <h6 class="text-muted">Additional Management</h6>
+                <button class="btn btn-secondary btn-sm" disabled>
+                    <i class="bi bi-person-check"></i> Manage Users
+                </button>
+                <button class="btn btn-secondary btn-sm" disabled>
+                    <i class="bi bi-calendar2-event"></i> View Bookings
+                </button>
             </div>
         </div>
     </div>
+</div>
 {% endblock %}
