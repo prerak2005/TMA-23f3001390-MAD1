@@ -1,0 +1,84 @@
+{% extends 'base.html' %}
+
+{% block title %}Pending Staff Approvals{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-5">
+
+    <h1 class="mb-4">Pending Staff Approvals</h1>
+
+    <!-- Back Button -->
+    <a href="{{ url_for('admin.dashboard') }}" class="btn btn-secondary mb-3">
+        ← Back to Dashboard
+    </a>
+
+    <!-- Link to view all staff -->
+    <a href="{{ url_for('admin.view_all_staff') }}" class="btn btn-info mb-3">
+        View All Staff
+    </a>
+
+    <!-- Pending Staff Table -->
+    {% if pending_profiles %}
+        <p class="text-muted">{{ pending_profiles | length }} staff member(s) awaiting approval.</p>
+
+        <div class="table-responsive">
+            <table class="table table-hover table-striped">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Contact</th>
+                        <th>Specialization</th>
+                        <th>Experience</th>
+                        <th>Applied On</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for profile in pending_profiles %}
+                        <!-- profile.user gives us the linked User via backref -->
+                        <tr>
+                            <td><strong>{{ profile.user.name }}</strong></td>
+                            <td>{{ profile.user.email }}</td>
+                            <td>{{ profile.user.contact_number or 'N/A' }}</td>
+                            <td>
+                                <span class="badge bg-info">
+                                    {{ profile.specialization or 'N/A' }}
+                                </span>
+                            </td>
+                            <td>{{ profile.experience }} yr(s)</td>
+                            <td>{{ profile.created_at.strftime('%d-%m-%Y') }}</td>
+                            <td>
+                                <!-- Approve Form — POST to approve route with user_id -->
+                                <form method="POST"
+                                      action="{{ url_for('admin.approve_staff', user_id=profile.user.id) }}"
+                                      style="display: inline;">
+                                    <button type="submit" class="btn btn-sm btn-success">
+                                        ✓ Approve
+                                    </button>
+                                </form>
+
+                                <!-- Reject Form — POST to reject route with user_id -->
+                                <form method="POST"
+                                      action="{{ url_for('admin.reject_staff', user_id=profile.user.id) }}"
+                                      style="display: inline;">
+                                    <button type="submit" class="btn btn-sm btn-danger">
+                                        ✗ Reject
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+    {% else %}
+        <!-- No pending staff -->
+        <div class="alert alert-success" role="alert">
+            ✓ No pending staff approvals. All applications have been reviewed.
+        </div>
+    {% endif %}
+
+</div>
+{% endblock %}
