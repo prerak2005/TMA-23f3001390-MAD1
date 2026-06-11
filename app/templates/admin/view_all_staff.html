@@ -1,0 +1,116 @@
+{% extends 'base.html' %}
+
+{% block title %}All Staff Members{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-5">
+
+    <h1 class="mb-4">All Staff Members</h1>
+
+    <!-- Back Button -->
+    <a href="{{ url_for('admin.dashboard') }}" class="btn btn-secondary mb-3">
+        ← Back to Dashboard
+    </a>
+
+    <!-- Link to pending staff -->
+    <a href="{{ url_for('admin.view_pending_staff') }}" class="btn btn-warning mb-3">
+        View Pending Approvals
+    </a>
+
+    <!-- Stats Cards -->
+    <div class="row mb-4">
+        {% set approved_count = all_profiles | selectattr('status', 'equalto', 'approved') | list | length %}
+        {% set pending_count = all_profiles | selectattr('status', 'equalto', 'pending') | list | length %}
+        {% set rejected_count = all_profiles | selectattr('status', 'equalto', 'rejected') | list | length %}
+
+        <div class="col-md-3">
+            <div class="card border-success shadow-sm">
+                <div class="card-body text-center">
+                    <h6 class="card-title text-muted">Approved Staff</h6>
+                    <h2 class="text-success">{{ approved_count }}</h2>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card border-warning shadow-sm">
+                <div class="card-body text-center">
+                    <h6 class="card-title text-muted">Pending Approval</h6>
+                    <h2 class="text-warning">{{ pending_count }}</h2>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card border-danger shadow-sm">
+                <div class="card-body text-center">
+                    <h6 class="card-title text-muted">Rejected</h6>
+                    <h2 class="text-danger">{{ rejected_count }}</h2>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card border-primary shadow-sm">
+                <div class="card-body text-center">
+                    <h6 class="card-title text-muted">Total Staff</h6>
+                    <h2 class="text-primary">{{ all_profiles | length }}</h2>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- All Staff Table -->
+    {% if all_profiles %}
+        <div class="table-responsive">
+            <table class="table table-hover table-striped">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Specialization</th>
+                        <th>Experience</th>
+                        <th>Status</th>
+                        <th>Applied On</th>
+                        <th>Updated On</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for profile in all_profiles %}
+                        <tr>
+                            <td><strong>{{ profile.user.name }}</strong></td>
+                            <td>{{ profile.user.email }}</td>
+                            <td>
+                                <span class="badge bg-info">
+                                    {{ profile.specialization or 'N/A' }}
+                                </span>
+                            </td>
+                            <td>{{ profile.experience }} yr(s)</td>
+                            <td>
+                                {% if profile.status == 'approved' %}
+                                    <span class="badge bg-success">✓ Approved</span>
+                                {% elif profile.status == 'pending' %}
+                                    <span class="badge bg-warning">⏳ Pending</span>
+                                {% elif profile.status == 'rejected' %}
+                                    <span class="badge bg-danger">✗ Rejected</span>
+                                {% else %}
+                                    <span class="badge bg-secondary">{{ profile.status }}</span>
+                                {% endif %}
+                            </td>
+                            <td>{{ profile.created_at.strftime('%d-%m-%Y') }}</td>
+                            <td>{{ profile.updated_at.strftime('%d-%m-%Y') }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+    {% else %}
+        <!-- No staff found -->
+        <div class="alert alert-info" role="alert">
+            No staff members found in the system.
+        </div>
+    {% endif %}
+
+</div>
+{% endblock %}
