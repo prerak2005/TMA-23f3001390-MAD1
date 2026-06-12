@@ -391,3 +391,66 @@ def view_all_staff():
     all_profiles = StaffProfile.query.all()
  
     return render_template('admin/view_all_staff.html', all_profiles=all_profiles)
+
+
+# USER MANAGEMENT ROUTES
+@admin.route('/users')
+@login_required
+def manage_users():
+    '''
+    View all users and manage their status
+    '''
+
+    search_query = request.args.get('search', '').strip()
+
+    if search_query:
+        users = User.query.filter_by(role='user').filter(
+            db.or_(
+                User.name.ilike(f'%{search_query}%'),
+                User.email.ilike(f'%{search_query}%')
+            )
+        ).all()
+        search_message = f'Found {len(users)} user(s) matching "{search_query}"'
+    else:
+        users = User.query.filter_by(role='user').order_by(User.created_at.desc()).all()
+        search_message = None
+
+    return render_template(
+        'admin/manage_users.html',
+        users=users,
+        search_query=search_query,
+        search_message=search_message
+    )
+
+
+@admin.route('/user/<int:user_id>/toggle-status', methods=['POST'])
+@login_required
+def toggle_user_status(user_id):
+    '''
+
+    Toggle user status (Active -> BLacklisted/BLacklisted -> Active)
+    
+    '''
+
+    user = User.query.get_or_404(user_id)
+
+    if user.role == 'admin':
+        flash('Cannot modify admin users!', 'danger')
+        return redirect(url_for('admin.manage_users'))
+    
+    try:
+        if user.status == 'active':
+            user.status = 'blacklisted'
+            action = 'blacklisted'
+        else:
+            user.status = 'active'
+            action = 'activated'
+
+        db.session.commit()
+        flash(f'User "{user.name}" {action} successfully!', 'success')
+    except Exception as e:
+        db.session.rollback()
+        flash(f'Error updating user: {str(e)}', 'danger')
+
+    return redirect(url_for('admin.manage_users'))
+
