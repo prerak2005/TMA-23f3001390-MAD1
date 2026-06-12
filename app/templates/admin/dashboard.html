@@ -91,12 +91,12 @@
                 </a>
             </div>
  
-            <!-- Future Management Buttons -->
+            <!-- Users Management Buttons -->
             <div class="mb-3">
-                <h6 class="text-muted">Additional Management</h6>
-                <button class="btn btn-secondary btn-sm" disabled>
-                    <i class="bi bi-person-check"></i> Manage Users
-                </button>
+                <h6 class="text-muted">User Management</h6>
+                <a href="{{ url_for('admin.manage_users') }}" class="btn btn-success btn-sm">
+                    <i class="bi bi-people"></i>Manage Users
+                </a>
                 <button class="btn btn-secondary btn-sm" disabled>
                     <i class="bi bi-calendar2-event"></i> View Bookings
                 </button>

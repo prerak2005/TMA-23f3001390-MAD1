@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+
+{% block title %}Manage Users - Admin{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-5">
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <h2>Manage Users(Trekkers)</h2>
+        </div>
+    </div>
+
+    <!-- Search Form -->
+     <div class="card mb-4 shadow-sm">
+        <div class="card-body">
+            <form method="GET" action="{{ url_for('admin.manage_users')}}" class="d-flex gap-2">
+                <input
+                    type="text"
+                    name="search"
+                    class="form-control"
+                    placeholder="Search by name or email"
+                    value="{{ search_query }}"
+                    >
+                <button type="submit" class="btn btn-outline-primary">Search</button>
+                {% if search_query %}
+                    <a href="{{ url_for('admin.manage_users') }}" class="btn btn-outline-secondary">Clear</a>
+                {% endif %}
+            </form>
+        </div>
+     </div>
+
+     <!-- Search Results Message -->
+      {% if search_message %}
+      <div class="alert alert-info alert-dismissable fade show">
+        <strong>Search Results</strong> {{ search_message }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+      </div>
+      {% endif %}
+
+      <!-- Users Table -->
+       {% if users %}
+       <div class="table-responsive">
+        <table class="table table-hover table-striped">
+            <thead class="table-dark">
+                <tr>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Phone</th>
+                    <th>Whatsapp</th>
+                    <th>Status</th>
+                    <th>Joined</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for user in users %}
+                <tr>
+                    <td><strong>{{ user.name }}</strong></td>
+                    <td>{{ user.email }}</td>
+                    <td>{{ user.contact_number if user.contact_number else '-' }}</td>
+                    <td>{{ user.whatsapp_number if user.whatsapp_number else '-' }}</td>
+                    <td>
+                        {% if user.status == 'active' %}
+                            <span class="badge bg-success">{{ user.status }}</span>
+                        {% elif user.status == 'blacklisted' %}
+                            <span class="badge bg-danger">{{ user.status }}</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <small>{{ user.created_at.strftime('%d-%m-%Y') }}</small>
+                    </td>
+                    <td>
+                        <form method="POST" action="{{ url_for('admin.toggle_user_status', user_id=user.id) }}" style="display:inline;">
+                                {% if user.status == 'active' %}
+                                    <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Blacklist this user?')">Blacklist</button>
+                                {% else %}
+                                    <button type="submit" class="btn btn-sm btn-success">Activate</button>
+                                {% endif %}
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+       </div>
+       {% else %}
+       <div class="alert alert-warning text-center py-5">
+        <h5>No Users Found</h5>
+       </div>
+       {% endif %}
+</div>
+{% endblock %}
