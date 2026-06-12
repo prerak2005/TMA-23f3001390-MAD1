@@ -255,6 +255,34 @@ def delete_trek_confirm(trek_id):
     return render_template('admin/delete_trek_confirm.html', trek=trek)
 
 
+@admin.route('/trek/<int:trek_id>/status/<new_status>', method=['POST'])
+@login_required
+def update_trek_status(trek_id, new_status):
+    '''
+
+    Update Trek Status (Pending -> Approved -> Open -> Closed -> Completed)
+    
+    '''
+
+    trek = Trek.query.get_or_404(trek_id)
+
+    valid_responses = ['Pending', 'Approved', 'Open', 'Closed', 'Completed']
+
+    if new_status not in valid_responses:
+        flash('Invalid Status!', 'danger')
+        return redirect(url_for('admin.manage_treks'))
+    
+    try:
+        trek.status = new_status
+        db.session.commit()
+        flash(f'Trek "{trek.name}" status changed to {new_status}', 'success')
+    except Exception as e:
+        db.session.rollback()
+        flash(f'Error updating status: {str(e)}', 'danger')
+
+    return redirect(url_for('admin.manage_treks'))
+
+
 # STAFF MANAGEMENT ROUTES
 @admin.route('/staff/pending')
 @login_required
