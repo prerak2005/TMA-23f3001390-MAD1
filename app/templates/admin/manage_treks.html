@@ -94,17 +94,35 @@
                             </span>
                         </td>
                         <td>
-                            {% if trek.status == 'Pending' %}
+                            <div class="btn-group btn-group-sm" role="group">
+                                {% if trek.status == 'Pending' %}
                                 <span class="badge bg-secondary">{{ trek.status }}</span>
-                            {% elif trek.status == 'Approved' %}
-                                <span class="badge bg-success">{{ trek.status }}</span>
-                            {% elif trek.status == 'Open' %}
-                                <span class="badge bg-success">{{ trek.status }}</span>
-                            {% elif trek.status == 'Closed' %}
-                                <span class="badge bg-danger">{{ trek.status }}</span>
-                            {% elif trek.status == 'Completed' %}
-                                <span class="badge bg-dark">{{ trek.status }}</span>
-                            {% endif %}
+                                <form method="POST" action="{{ url_for('admin.update_TREK_status', trek_id=trek.id, new_status='Approved') }}" style="display:inline;">
+                                    <button type="submit" class="btn btn-sm btn-outline-success" title="Approve Trek">Approve</button>
+                                </form>
+
+                                {% elif trek.status == 'Approved' %}
+                                <span class="badge bg-secondary">{{ trek.status }}</span>
+                                <form method="POST" action="{{ url_for('admin.update_TREK_status', trek_id=trek.id, new_status='Open') }}" style="display:inline;">
+                                    <button type="submit" class="btn btn-sm btn-outline-success" title="Open for Booking">Open</button>
+                                </form>
+
+                                {% elif trek.status == 'Open' %}
+                                <span class="badge bg-secondary">{{ trek.status }}</span>
+                                <form method="POST" action="{{ url_for('admin.update_TREK_status', trek_id=trek.id, new_status='Closed') }}" style="display:inline;">
+                                    <button type="submit" class="btn btn-sm btn-outline-success" title="Close Trek">Close</button>
+                                </form>
+
+                                {% elif trek.status == 'Closed' %}
+                                <span class="badge bg-secondary">{{ trek.status }}</span>
+                                <form method="POST" action="{{ url_for('admin.update_TREK_status', trek_id=trek.id, new_status='Completed') }}" style="display:inline;">
+                                    <button type="submit" class="btn btn-sm btn-outline-success" title="Mark Complete">Complete</button>
+                                </form>
+
+                                {% elif trek.status == 'Completed' %}
+                                    <span class="badge bg-dark">{{ trek.status }}</span>
+                                {% endif %}
+                            </div>
                         </td>
                         <td>
                             <a href="{{ url_for('admin.edit_trek', trek_id=trek.id) }}" class="btn btn-sm btn-warning" title="Edit Trek">Edit</a>
