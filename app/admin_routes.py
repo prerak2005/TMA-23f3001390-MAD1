@@ -255,7 +255,7 @@ def delete_trek_confirm(trek_id):
     return render_template('admin/delete_trek_confirm.html', trek=trek)
 
 
-@admin.route('/trek/<int:trek_id>/status/<new_status>', method=['POST'])
+@admin.route('/trek/<int:trek_id>/status/<new_status>', methods=['POST'])
 @login_required
 def update_trek_status(trek_id, new_status):
     '''
