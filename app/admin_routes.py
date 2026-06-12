@@ -454,3 +454,54 @@ def toggle_user_status(user_id):
 
     return redirect(url_for('admin.manage_users'))
 
+
+@admin.route('/bookings')
+@login_required
+def manage_bookings():
+    '''
+    
+    View all bookings
+    
+    '''
+
+    bookings = Booking.query.join(User).join(Trek).order_by(Booking.created_at.desc()).all()
+    
+    stats = {
+        'total_bookings': len(bookings),
+        'pending_bookings': sum(1 for b in bookings if b.booking_status == 'Booked'),
+        'completed_bookings': sum(1 for b in bookings if b.booking_status == 'Completed'),
+        'cancelled_bookings': sum(1 for b in bookings if b.booking_status == 'Cancelled')
+    }
+    
+    return render_template('admin/manage_bookings.html', bookings=bookings, stats=stats)
+
+
+@admin.route('/booking/<int:booking_id>/cancel', methods=['POST'])
+@login_required
+def cancel_booking(booking_id):
+    '''
+    
+    Cancel a booking
+    
+    '''
+
+    booking = Booking.query.get_or_404(booking_id)
+    
+    if booking.booking_status == 'Cancelled':
+        flash('This booking is already cancelled!', 'warning')
+        return redirect(url_for('admin.manage_bookings'))
+    
+    try:
+        booking.booking_status = 'Cancelled'
+        
+        # Return slots to trek
+        trek = Trek.query.get(booking.trek_id)
+        trek.available_slots += 1
+        
+        db.session.commit()
+        flash(f'Booking cancelled successfully!', 'success')
+    except Exception as e:
+        db.session.rollback()
+        flash(f'Error cancelling booking: {str(e)}', 'danger')
+    
+    return redirect(url_for('admin.manage_bookings'))
