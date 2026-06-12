@@ -464,7 +464,7 @@ def manage_bookings():
     
     '''
 
-    bookings = Booking.query.join(User).join(Trek).order_by(Booking.created_at.desc()).all()
+    bookings = Booking.query.order_by(Booking.created_at.desc()).all()
     
     stats = {
         'total_bookings': len(bookings),
