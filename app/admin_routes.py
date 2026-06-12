@@ -404,7 +404,7 @@ def manage_users():
     search_query = request.args.get('search', '').strip()
 
     if search_query:
-        users = User.query.filter_by(role='user').filter(
+        users = User.query.filter_by(role='trekker').filter(
             db.or_(
                 User.name.ilike(f'%{search_query}%'),
                 User.email.ilike(f'%{search_query}%')
@@ -412,7 +412,7 @@ def manage_users():
         ).all()
         search_message = f'Found {len(users)} user(s) matching "{search_query}"'
     else:
-        users = User.query.filter_by(role='user').order_by(User.created_at.desc()).all()
+        users = User.query.filter_by(role='trekker').order_by(User.created_at.desc()).all()
         search_message = None
 
     return render_template(
