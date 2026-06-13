@@ -1,5 +1,119 @@
 {% extends 'base.html' %}
+
 {% block content %}
-<h2>Staff Dashboard</h2>
-<p>Welcome, {{ current_user.name }}!</p>
+<div class="container-fluid mt-4">
+    <!-- Page Header -->
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h1>Staff Dashboard</h1>
+            <p class="text-muted">Welcome, {{ current_user.name }}. Manage your assigned treks below.</p>
+        </div>
+    </div>
+
+    <!-- Stats Cards -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card border-primary shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title text-primary">Total Treks</h5>
+                    <h2 class="card-text">{{ total_treks }}</h2>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card border-success shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title text-success">Open Treks</h5>
+                    <h2 class="card-text">{{ open_treks }}</h2>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card border-warning shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title text-warning">Closed Treks</h5>
+                    <h2 class="card-text">{{ closed_treks }}</h2>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card border-info shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title text-info">Total Participants</h5>
+                    <h2 class="card-text">{{ total_participants }}</h2>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Assigned Treks Table -->
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">Your Assigned Treks</h5>
+                </div>
+
+                {% if trek_data %}
+                    <div class="table-responsive">
+                        <table class="table table-hover table-striped mb-0">
+                            <thead>
+                                <tr>
+                                    <th>Trek Name</th>
+                                    <th>Location</th>
+                                    <th>Difficulty</th>
+                                    <th>Status</th>
+                                    <th>Participants</th>
+                                    <th>Slots Available</th>
+                                    <th>Start Date</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for data in trek_data %}
+                                    <tr>
+                                        <td><strong>{{ data.trek.name }}</strong></td>
+                                        <td>{{ data.trek.location }}</td>
+                                        <td>
+                                            <span class="badge bg-secondary">{{ data.trek.difficulty }}</span>
+                                        </td>
+                                        <td>
+                                            {% if data.trek.status == 'open' %}
+                                                <span class="badge bg-success">Open</span>
+                                            {% elif data.trek.status == 'closed' %}
+                                                <span class="badge bg-danger">Closed</span>
+                                            {% elif data.trek.status == 'completed' %}
+                                                <span class="badge bg-dark">Completed</span>
+                                            {% elif data.trek.status == 'pending' %}
+                                                <span class="badge bg-warning">Pending</span>
+                                            {% elif data.trek.status == 'approved' %}
+                                                <span class="badge bg-info">Approved</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>{{ data.participant_count }}</td>
+                                        <td>{{ data.available_slots }} / {{ data.trek.total_slots }}</td>
+                                        <td>{{ data.trek.start_date.strftime('%d %b %Y') }}</td>
+                                        <td>
+                                            <a href="{{ url_for('staff.trek_details', trek_id=data.trek.id) }}" class="btn btn-sm btn-primary">
+                                                Manage
+                                            </a>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <div class="card-body">
+                        <p class="text-muted text-center mb-0">No treks assigned to you yet.</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+</div>
 {% endblock %}
