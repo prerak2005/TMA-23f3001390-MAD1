@@ -1,0 +1,106 @@
+{% extends "base.html" %}
+
+{% block title %}Manage Bookings - Admin{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-5">
+    <h2>All Bookings</h2>
+    
+    <!-- Booking Stats -->
+    <div class="row mb-4 mt-4">
+        <div class="col-md-3 mb-3">
+            <div class="card border-primary shadow-sm">
+                <div class="card-body">
+                    <h6 class="card-title text-muted">Total Bookings</h6>
+                    <h2 class="card-text text-primary">{{ stats.total_bookings }}</h2>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3 mb-3">
+            <div class="card border-success shadow-sm">
+                <div class="card-body">
+                    <h6 class="card-title text-muted">Pending</h6>
+                    <h2 class="card-text text-success">{{ stats.pending_bookings }}</h2>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3 mb-3">
+            <div class="card border-info shadow-sm">
+                <div class="card-body">
+                    <h6 class="card-title text-muted">Completed</h6>
+                    <h2 class="card-text text-info">{{ stats.completed_bookings }}</h2>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3 mb-3">
+            <div class="card border-danger shadow-sm">
+                <div class="card-body">
+                    <h6 class="card-title text-muted">Cancelled</h6>
+                    <h2 class="card-text text-danger">{{ stats.cancelled_bookings }}</h2>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Bookings Table -->
+    {% if bookings %}
+        <div class="table-responsive">
+            <table class="table table-hover table-striped">
+                <thead class="table-dark">
+                    <tr>
+                        <th>User</th>
+                        <th>Trek</th>
+                        <th>Location</th>
+                        <th>Booking Date</th>
+                        <th>Booking Status</th>
+                        <th>Payment Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for booking in bookings %}
+                    <tr>
+                        <td><strong>{{ booking.user.name }}</strong></td>
+                        <td>{{ booking.trek.name }}</td>
+                        <td>{{ booking.trek.location }}</td>
+                        <td>{{ booking.booking_date.strftime('%d-%m-%Y') }}</td>
+                        <td>
+                            {% if booking.booking_status == 'Booked' %}
+                                <span class="badge bg-info">{{ booking.booking_status }}</span>
+                            {% elif booking.booking_status == 'Completed' %}
+                                <span class="badge bg-success">{{ booking.booking_status }}</span>
+                            {% elif booking.booking_status == 'Cancelled' %}
+                                <span class="badge bg-danger">{{ booking.booking_status }}</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if booking.payment_status == 'Pending' %}
+                                <span class="badge bg-warning text-dark">{{ booking.payment_status }}</span>
+                            {% elif booking.payment_status == 'Completed' %}
+                                <span class="badge bg-success">{{ booking.payment_status }}</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if booking.booking_status != 'Cancelled' %}
+                                <form method="POST" action="{{ url_for('admin.cancel_booking', booking_id=booking.id) }}" style="display:inline;">
+                                    <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Cancel this booking?')">Cancel</button>
+                                </form>
+                            {% else %}
+                                <span class="text-muted small">—</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <div class="alert alert-warning text-center py-5">
+            <h5>No bookings found</h5>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}
