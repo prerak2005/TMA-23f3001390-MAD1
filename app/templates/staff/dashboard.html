@@ -96,10 +96,9 @@
                                         <td>{{ data.participant_count }}</td>
                                         <td>{{ data.available_slots }} / {{ data.trek.total_slots }}</td>
                                         <td>{{ data.trek.start_date.strftime('%d %b %Y') }}</td>
-                                        <td>
-                                            <a href="{{ url_for('staff.trek_details', trek_id=data.trek.id) }}" class="btn btn-sm btn-primary">
-                                                Manage
-                                            </a>
+                                                                  <td>
+                                            <!-- Manage button will be added later -->
+                                            <span class="text-muted text-sm">Coming soon</span>
                                         </td>
                                     </tr>
                                 {% endfor %}
