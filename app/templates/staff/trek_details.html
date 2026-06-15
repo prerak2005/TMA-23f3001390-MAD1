@@ -1,0 +1,203 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container-fluid mt-4">
+    <!-- Back Button & Header -->
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <a href="{{ url_for('staff.dashboard') }}" class="btn btn-secondary mb-3">← Back to Dashboard</a>
+            <h1>{{ trek.name }}</h1>
+            <p class="text-muted">Manage trek details, participants, and slots below</p>
+        </div>
+    </div>
+
+    <!-- Trek Info Cards -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h6 class="card-title text-muted">Location</h6>
+                    <p class="card-text"><strong>{{ trek.location }}</strong></p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h6 class="card-title text-muted">Difficulty</h6>
+                    <p class="card-text"><span class="badge bg-secondary">{{ trek.difficulty }}</span></p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h6 class="card-title text-muted">Duration</h6>
+                    <p class="card-text"><strong>{{ trek.duration }} days</strong></p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h6 class="card-title text-muted">Status</h6>
+                    <p class="card-text">
+                        {% if trek.status == 'open' %}
+                            <span class="badge bg-success">Open</span>
+                        {% elif trek.status == 'closed' %}
+                            <span class="badge bg-danger">Closed</span>
+                        {% elif trek.status == 'completed' %}
+                            <span class="badge bg-dark">Completed</span>
+                        {% elif trek.status == 'pending' %}
+                            <span class="badge bg-warning">Pending</span>
+                        {% elif trek.status == 'approved' %}
+                            <span class="badge bg-info">Approved</span>
+                        {% endif %}
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Dates Info -->
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h6 class="card-title text-muted">Start Date</h6>
+                    <p class="card-text"><strong>{{ trek.start_date.strftime('%d %B %Y') }}</strong></p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h6 class="card-title text-muted">End Date</h6>
+                    <p class="card-text"><strong>{{ trek.end_date.strftime('%d %B %Y') }}</strong></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slots Information & Update -->
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <div class="card border-info shadow-sm">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0">Slots Information</h5>
+                </div>
+                <div class="card-body">
+                    <p><strong>Total Slots:</strong> {{ trek.total_slots }}</p>
+                    <p><strong>Available Slots:</strong> {{ trek.available_slots }}</p>
+                    <p><strong>Booked Slots:</strong> {{ participant_count }}</p>
+                    <div class="progress mt-2">
+                        {% set booked_percent = (participant_count / trek.total_slots * 100) if trek.total_slots > 0 else 0 %}
+                        <div class="progress-bar" role="progressbar" style="width: {{ booked_percent }}%;" 
+                             aria-valuenow="{{ participant_count }}" aria-valuemin="0" aria-valuemax="{{ trek.total_slots }}">
+                            {{ participant_count }} / {{ trek.total_slots }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="card border-warning shadow-sm">
+                <div class="card-header bg-warning">
+                    <h5 class="mb-0">Update Available Slots</h5>
+                </div>
+                <div class="card-body">
+                   <p class="text-muted">Coming soon</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Status Update -->
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <div class="card border-primary shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">Change Trek Status</h5>
+                </div>
+                <div class="card-body">
+                    <p class="text-muted">Coming soon</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Participants List -->
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card shadow-sm">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0">Registered Participants ({{ participant_count }})</h5>
+                </div>
+
+                {% if participants %}
+                    <div class="table-responsive">
+                        <table class="table table-hover table-striped mb-0">
+                            <thead>
+                                <tr>
+                                    <th>Participant Name</th>
+                                    <th>Email</th>
+                                    <th>Contact</th>
+                                    <th>Booking Date</th>
+                                    <th>Booking Status</th>
+                                    <th>Payment Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for data in participants %}
+                                    <tr>
+                                        <td><strong>{{ data.user.name }}</strong></td>
+                                        <td>{{ data.user.email }}</td>
+                                        <td>
+                                            {% if data.user.contact_number %}
+                                                {{ data.user.contact_number }}
+                                            {% else %}
+                                                <span class="text-muted">N/A</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>{{ data.booking.created_at.strftime('%d %b %Y') }}</td>
+                                        <td>
+                                            {% if data.booking.booking_status == 'booked' %}
+                                                <span class="badge bg-success">Booked</span>
+                                            {% elif data.booking.booking_status == 'cancelled' %}
+                                                <span class="badge bg-danger">Cancelled</span>
+                                            {% elif data.booking.booking_status == 'completed' %}
+                                                <span class="badge bg-dark">Completed</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            {% if data.booking.payment_status == 'completed' %}
+                                                <span class="badge bg-success">Paid</span>
+                                            {% elif data.booking.payment_status == 'pending' %}
+                                                <span class="badge bg-warning">Pending</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            <span class="text-muted text-sm">Coming soon</span>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <div class="card-body">
+                        <p class="text-muted text-center mb-0">No participants registered yet.</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+</div>
+{% endblock %}

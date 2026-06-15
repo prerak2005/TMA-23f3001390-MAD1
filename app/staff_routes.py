@@ -68,3 +68,36 @@ def dashboard():
         closed_treks=closed_treks,
         total_participants=total_participants
         )
+
+
+@staff.route('/trek/<int:trek_id>')
+@login_required
+def trek_details(trek_id):
+    """
+
+    Display trek details including:
+    - Trek info (name, location, difficulty, dates, slots)
+    - List of registered participants with booking details
+    - Action buttons (Update Slots, Change Status, Remove Participant)
+
+    """
+    trek = get_trek_or_404(trek_id)
+    
+    # Get all bookings for this trek (all participants)
+    bookings = Booking.query.filter_by(trek_id=trek_id).all()
+    
+    # Enrich booking data with user details
+    participants = []
+    for booking in bookings:
+        user = User.query.get(booking.user_id)
+        participants.append({
+            'booking': booking,
+            'user': user
+        })
+    
+    return render_template(
+        'staff/trek_details.html',
+        trek=trek,
+        participants=participants,
+        participant_count=len(participants)
+    )
