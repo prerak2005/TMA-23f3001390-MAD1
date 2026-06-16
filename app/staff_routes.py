@@ -101,3 +101,69 @@ def trek_details(trek_id):
         participants=participants,
         participant_count=len(participants)
     )
+
+
+@staff.route('/trek/<int:trek_id>/update-slots', methods=['POST'])
+@login_required
+def update_trek_slots(trek_id):
+    """
+    Update available_slots for a trek.
+    
+    Validation:
+    1. Trek must be assigned to current staff
+    2. New available_slots must be >= 0
+    3. New available_slots must be <= total_slots
+    4. Cannot reduce below already booked count (data integrity)
+    
+    Process:
+    1. Get trek (with auth check)
+    2. Get new slot count from form
+    3. Validate new_available >= booked_count
+    4. Update trek.available_slots
+    5. Commit and redirect
+    
+    """
+    trek = get_trek_or_404(trek_id)
+    
+    # Get new available slots from form
+    try:
+        new_available = int(request.form.get('available_slots', 0))
+    except ValueError:
+        flash("Available slots must be a number", "error")
+        return redirect(url_for('staff.trek_details', trek_id=trek_id))
+    
+    # Validate: Not negative
+    if new_available < 0:
+        flash("Available slots cannot be negative", "error")
+        return redirect(url_for('staff.trek_details', trek_id=trek_id))
+    
+    # Validate: Not more than total slots
+    if new_available > trek.total_slots:
+        flash(f"Available slots cannot exceed total slots ({trek.total_slots})", "error")
+        return redirect(url_for('staff.trek_details', trek_id=trek_id))
+    
+    # Count current booked participants
+    booked_count = Booking.query.filter_by(
+        trek_id=trek_id, 
+        booking_status='booked'
+    ).count()
+    
+    # Validate: Cannot reduce below booked count
+    if new_available < booked_count:
+        flash(
+            f"Cannot reduce available slots below {booked_count} (current participants). "
+            f"Set at least {booked_count}.",
+            "error"
+        )
+        return redirect(url_for('staff.trek_details', trek_id=trek_id))
+    
+    # All validation passed - update slots
+    try:
+        trek.available_slots = new_available
+        db.session.commit()
+        flash(f"Trek slots updated to {new_available}", "success")
+    except Exception as e:
+        db.session.rollback()
+        flash(f"Error updating slots: {str(e)}", "error")
+    
+    return redirect(url_for('staff.trek_details', trek_id=trek_id))    

@@ -111,7 +111,17 @@
                     <h5 class="mb-0">Update Available Slots</h5>
                 </div>
                 <div class="card-body">
-                   <p class="text-muted">Coming soon</p>
+                   <form method="POST" action="{{ url_for('staff.update_trek_slots', trek_id=trek.id) }}">
+                        <div class="mb-3">
+                            <label for="available_slots" class="form-label">New Available Slots</label>
+                            <input type="number" class="form-control" id="available_slots" name="available_slots" 
+                                   value="{{ trek.available_slots }}" min="0" max="{{ trek.total_slots }}" required>
+                            <small class="form-text text-muted">
+                                Must be between 0 and {{ trek.total_slots }}. Cannot be less than {{ participant_count }} (current participants).
+                            </small>
+                        </div>
+                        <button type="submit" class="btn btn-warning w-100">Update Slots</button>
+                    </form>
                 </div>
             </div>
         </div>
