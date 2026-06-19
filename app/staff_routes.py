@@ -167,3 +167,65 @@ def update_trek_slots(trek_id):
         flash(f"Error updating slots: {str(e)}", "error")
     
     return redirect(url_for('staff.trek_details', trek_id=trek_id))    
+
+
+@staff.route('/trek/<int:trek_id>/update-status', methods=['POST'])
+@login_required
+def update_trek_status(trek_id):
+    '''
+    
+    Update trek status. Allowed transitions:
+    - open → closed
+    - closed → completed
+    - open → completed (direct)
+    
+    NOT allowed:
+    - pending (admin-only)
+    - approved (admin-only)
+    - backtracking (closed → open)
+    
+    Validation:
+    1. Trek must be assigned to current staff
+    2. New status must be valid enum value
+    3. Transition must be allowed 
+
+    '''
+
+    trek = get_trek_or_404(trek_id)
+    new_status = request.form.get('status', '').lower()
+    
+    # Convert current status to lowercase for comparison
+    current_status = trek.status.lower()
+    
+    # Define allowed transitions
+    valid_transitions = {
+        'open': ['closed', 'completed'],
+        'closed': ['completed'],
+        'completed': [],
+    }
+    
+    # Check if current status allows transitions
+    if current_status not in valid_transitions:
+        flash(f"Trek status {trek.status} is not open for staff changes. Admin only.", "error")
+        return redirect(url_for('staff.trek_details', trek_id=trek_id))
+    
+    # Check if new status is valid transition
+    if new_status not in valid_transitions[current_status]:
+        allowed = ', '.join(valid_transitions[current_status]) if valid_transitions[current_status] else 'None'
+        flash(
+            f"Invalid status transition: {trek.status} → {new_status}. "
+            f"Allowed: {allowed}",
+            "error"
+        )
+        return redirect(url_for('staff.trek_details', trek_id=trek_id))
+    
+    # Update status
+    try:
+        trek.status = new_status
+        db.session.commit()
+        flash(f"Trek status updated to {new_status.title()}", "success")
+    except Exception as e:
+        db.session.rollback()
+        flash(f"Error updating status: {str(e)}", "error")
+    
+    return redirect(url_for('staff.trek_details', trek_id=trek_id))

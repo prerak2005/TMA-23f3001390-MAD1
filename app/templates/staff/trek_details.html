@@ -135,7 +135,43 @@
                     <h5 class="mb-0">Change Trek Status</h5>
                 </div>
                 <div class="card-body">
-                    <p class="text-muted">Coming soon</p>
+                    <form method="POST" action="{{ url_for('staff.update_trek_status', trek_id=trek.id) }}">
+                        <div class="mb-3">
+                            <label for="status" class="form-label">New Status</label>
+                            <select class="form-select" id="status" name="status" required>
+                                <option value="">-- Select Status --</option>
+                                
+                                <!-- Show options based on current status -->
+                                {% set current_status = trek.status.lower() %}
+                                
+                                {% if current_status == 'open' %}
+                                    <option value="open" selected>Open (Current)</option>
+                                    <option value="closed">→ Closed</option>
+                                    <option value="completed">→ Completed</option>
+                                    
+                                {% elif current_status == 'closed' %}
+                                    <option value="closed" selected>Closed (Current)</option>
+                                    <option value="completed">→ Completed</option>
+                                    
+                                {% elif current_status == 'completed' %}
+                                    <option value="completed" selected>Completed (Final State)</option>
+                                    
+                                {% elif current_status == 'pending' %}
+                                    <option value="pending" selected>Pending (Admin Only)</option>
+                                    
+                                {% elif current_status == 'approved' %}
+                                    <option value="approved" selected>Approved (Admin Only)</option>
+                                    
+                                {% else %}
+                                    <option value="{{ trek.status }}" selected>{{ trek.status }} (Current: Unknown)</option>
+                                {% endif %}
+                            </select>
+                            <small class="form-text text-muted">
+                                You can only move forward in status. Pending → Approved transitions are admin-only.
+                            </small>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100">Update Status</button>
+                    </form>
                 </div>
             </div>
         </div>
