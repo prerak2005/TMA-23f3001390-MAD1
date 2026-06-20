@@ -229,7 +229,15 @@
                                             {% endif %}
                                         </td>
                                         <td>
-                                            <span class="text-muted text-sm">Coming soon</span>
+                                            {% if data.booking.booking_status == 'booked' %}
+                                                <form method="POST" action="{{ url_for('staff.remove_participant', trek_id=trek.id, booking_id=data.booking.id) }}" style="display:inline;">
+                                                    <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure you want to remove this participant?');">
+                                                        Remove
+                                                    </button>
+                                                </form>
+                                            {% else %}
+                                                <span class="text-muted text-sm">-</span>
+                                            {% endif %}
                                         </td>
                                     </tr>
                                 {% endfor %}

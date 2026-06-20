@@ -229,3 +229,48 @@ def update_trek_status(trek_id):
         flash(f"Error updating status: {str(e)}", "error")
     
     return redirect(url_for('staff.trek_details', trek_id=trek_id))
+
+
+@staff.route('/trek/<int:trek_id>/remove-participant/<int:booking_id>', methods=['POST'])
+@login_required
+def remove_participant(trek_id, booking_id):
+    """
+
+    Remove a participant (cancel their booking).
+    
+    Process:
+    1. Verify trek belongs to current staff
+    2. Find booking
+    3. Verify booking belongs to this trek
+    4. Set booking_status = 'cancelled'
+    5. Return slots to trek (increase available_slots)
+    6. Commit and redirect
+    
+    """
+    trek = get_trek_or_404(trek_id)
+    booking = Booking.query.get_or_404(booking_id)
+    
+    # Verify booking belongs to this trek
+    if booking.trek_id != trek_id:
+        flash("Booking does not belong to this trek", "error")
+        return redirect(url_for('staff.trek_details', trek_id=trek_id))
+    
+    # Get participant name before cancelling
+    participant_name = booking.user.name
+    
+    try:
+        # Check if booking is currently active (booked status)
+        if booking.booking_status == 'booked':
+            # Return slot to trek
+            trek.available_slots += 1
+        
+        # Cancel booking
+        booking.booking_status = 'cancelled'
+        
+        db.session.commit()
+        flash(f"Participant {participant_name} removed from trek", "success")
+    except Exception as e:
+        db.session.rollback()
+        flash(f"Error removing participant: {str(e)}", "error")
+    
+    return redirect(url_for('staff.trek_details', trek_id=trek_id))
