@@ -63,3 +63,39 @@ def booking_history():
         'user/booking_history.html',
         all_bookings=all_bookings
     )
+
+
+@user.route('/trek/<int:id>', methods=['GET'])
+@login_required
+def trek_details(id):
+    """
+    Display detailed information for a specific trek.
+    
+    Process:
+    1. Query trek by ID (404 if not found)
+    2. Check if trek is Open
+    3. Count current participants
+    4. Calculate slots remaining
+    5. Pass all info to template
+    
+    """
+    
+    # Get trek or show 404
+    trek = Trek.query.get_or_404(id)
+    
+    # Get all bookings for this trek (for participant count)
+    bookings = Booking.query.filter_by(trek_id=id).all()
+    participant_count = len(bookings)
+    
+    # Check if current user already booked this trek
+    user_booking = Booking.query.filter_by(
+        user_id=current_user.id,
+        trek_id=id
+    ).first()
+    
+    return render_template(
+        'user/trek_details.html',
+        trek=trek,
+        participant_count=participant_count,
+        user_booking=user_booking
+    )
