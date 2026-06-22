@@ -11,11 +11,54 @@
 
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
     <div class="container">
-        <a class="navbar-brand" href="/">🏔️ TMA</a>
+        <a class="navbar-brand" href="/"> TMA</a>
         <div class="ms-auto">
             {% if current_user.is_authenticated %}
-                <span class="navbar-text text-white me-3">Hello, {{ current_user.name }}</span>
-                <a href="{{ url_for('auth.logout') }}" class="btn btn-outline-light btn-sm">Logout</a>
+                <!-- User Info + Dropdown Menu -->
+                <div class="dropdown">
+                    <button 
+                        class="btn btn-outline-light btn-sm dropdown-toggle" 
+                        type="button" 
+                        id="userDropdown" 
+                        data-bs-toggle="dropdown" 
+                        aria-expanded="false"
+                    >
+                         {{ current_user.name }}
+                    </button>
+                    
+                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+                        <!-- ADMIN MENU -->
+                        {% if current_user.role == 'admin' %}
+                            <li><h6 class="dropdown-header">Admin Panel</h6></li>
+                            <li><a class="dropdown-item" href="{{ url_for('admin.dashboard') }}">Dashboard</a></li>
+                            <li><a class="dropdown-item" href="{{ url_for('admin.manage_treks') }}">Manage Treks</a></li>
+                            <li><a class="dropdown-item" href="{{ url_for('admin.manage_staff') }}">Manage Staff</a></li>
+                            <li><a class="dropdown-item" href="{{ url_for('admin.manage_users') }}">Manage Users</a></li>
+                            <li><a class="dropdown-item" href="{{ url_for('admin.manage_bookings') }}">Manage Bookings</a></li>
+                            <li><hr class="dropdown-divider"></li>
+
+                        <!-- STAFF MENU -->
+                        {% elif current_user.role == 'staff' %}
+                            <li><h6 class="dropdown-header">Staff Panel</h6></li>
+                            <li><a class="dropdown-item" href="{{ url_for('staff.dashboard') }}">Dashboard</a></li>
+                            <li><hr class="dropdown-divider"></li>
+
+                        <!-- TREKKER MENU -->
+                        {% elif current_user.role == 'trekker' %}
+                            <li><h6 class="dropdown-header">Bookings</h6></li>
+                            <li><a class="dropdown-item" href="{{ url_for('user.trek_listing') }}">Browse Treks</a></li>
+                            <li><a class="dropdown-item" href="{{ url_for('user.dashboard') }}">Dashboard</a></li>
+                            <li><a class="dropdown-item" href="{{ url_for('user.booking_history') }}">Booking History</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                        {% endif %}
+
+                        <!-- COMMON MENU (All Roles) -->
+                        <li><a class="dropdown-item" href="#">Profile</a></li>
+                        <li><a class="dropdown-item" href="#">Settings</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item text-danger" href="{{ url_for('auth.logout') }}">Logout</a></li>
+                    </ul>
+                </div>
             {% else %}
                 <a href="{{ url_for('auth.login') }}" class="btn btn-outline-light btn-sm me-2">Login</a>
             {% endif %}

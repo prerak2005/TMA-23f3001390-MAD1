@@ -1,0 +1,150 @@
+{% extends "base.html" %}
+
+{% block title %}Available Treks - TMA{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <!-- Page Header -->
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h1>Available Treks</h1>
+            <p class="text-muted">Browse and book your next trekking adventure</p>
+        </div>
+        <div class="col-md-4 text-end">
+            <a href="{{ url_for('user.trek_listing') }}" class="btn btn-outline-secondary">
+                Clear Search
+            </a>
+        </div>
+    </div>
+
+    <!-- Search Bar -->
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <form method="GET" class="d-flex gap-2">
+                <input 
+                    type="text" 
+                    name="search" 
+                    class="form-control" 
+                    placeholder="Search by trek name or location..."
+                    value="{{ search_query }}"
+                >
+                <button type="submit" class="btn btn-primary">
+                    Search
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Trek Count -->
+    <div class="row mb-3">
+        <div class="col-md-12">
+            <p class="text-muted">
+                Found <strong>{{ treks|length }}</strong> trek(s)
+                {% if search_query %}
+                    matching "<strong>{{ search_query }}</strong>"
+                {% endif %}
+            </p>
+        </div>
+    </div>
+
+    <!-- Trek Cards Grid -->
+    {% if treks %}
+        <div class="row g-4">
+            {% for trek in treks %}
+            <div class="col-md-4">
+                <div class="card h-100 shadow-sm border-0">
+                    <!-- Card Header with Trek Name -->
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="card-title mb-0">{{ trek.name }}</h5>
+                    </div>
+
+                    <!-- Card Body with Trek Details -->
+                    <div class="card-body">
+                        <!-- Location -->
+                        <p class="card-text">
+                            <strong>Location:</strong><br>
+                            {{ trek.location }}
+                        </p>
+
+                        <!-- Difficulty -->
+                        <p class="card-text">
+                            <strong>Difficulty:</strong><br>
+                            <span class="badge bg-warning text-dark">
+                                {{ trek.difficulty }}
+                            </span>
+                        </p>
+
+                        <!-- Duration -->
+                        <p class="card-text">
+                            <strong>Duration:</strong><br>
+                            {{ trek.duration }} days
+                        </p>
+
+                        <!-- Available Slots -->
+                        <p class="card-text">
+                            <strong>Available Slots:</strong><br>
+                            <span class="badge bg-success">
+                                {{ trek.available_slots }} / {{ trek.total_slots }}
+                            </span>
+                        </p>
+
+                        <!-- Start Date -->
+                        <p class="card-text">
+                            <strong>Start Date:</strong><br>
+                            {{ trek.start_date.strftime('%d %b %Y') }}
+                        </p>
+
+                        <!-- Staff Name -->
+                        {% if trek.assigned_staff %}
+                        <p class="card-text">
+                            <strong>Led by:</strong><br>
+                            {{ trek.assigned_staff.name }}
+                        </p>
+                        {% endif %}
+                    </div>
+
+                    <!-- Card Footer with Button -->
+                    <div class="card-footer bg-light">
+                        {% if trek.available_slots > 0 %}
+                            <a 
+                                href="{{ url_for('user.trek_details', id=trek.id) }}" 
+                                class="btn btn-primary w-100"
+                            >
+                                View Details & Book
+                            </a>
+                        {% else %}
+                            <button class="btn btn-secondary w-100" disabled>
+                                No Slots Available
+                            </button>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+    <!-- No Treks Found -->
+    {% else %}
+        <div class="alert alert-info" role="alert">
+            <h5>No Treks Available</h5>
+            <p>
+                {% if search_query %}
+                    No treks match your search for "<strong>{{ search_query }}</strong>".
+                    <a href="{{ url_for('user.trek_listing') }}">Clear search</a> to see all treks.
+                {% else %}
+                    No open treks available at the moment. Check back soon!
+                {% endif %}
+            </p>
+        </div>
+    {% endif %}
+
+    <!-- Back to Dashboard Button -->
+    <div class="row mt-5">
+        <div class="col-md-12">
+            <a href="{{ url_for('user.dashboard') }}" class="btn btn-outline-secondary">
+                ← Back to Dashboard
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}
