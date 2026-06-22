@@ -40,3 +40,26 @@ def trek_listing():
         treks=treks,
         search_query=search_query
     )
+
+
+@user.route('/booking-history', methods=['GET'])
+@login_required
+def booking_history():
+    """
+    Show all user's bookings (booked and cancelled).
+    
+    Process:
+    1. Get all bookings for current user
+    2. Sort by booking_date (newest first)
+    3. Include trek info for display
+    """
+    
+    # Get all user's bookings (any status)
+    all_bookings = Booking.query.filter_by(
+        user_id=current_user.id
+    ).order_by(Booking.booking_date.desc()).all()
+    
+    return render_template(
+        'user/booking_history.html',
+        all_bookings=all_bookings
+    )

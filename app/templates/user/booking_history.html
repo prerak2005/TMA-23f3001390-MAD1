@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+
+{% block title %}Booking History - TMA{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h1>Booking History</h1>
+            <p class="text-muted">View all your trek bookings</p>
+        </div>
+        <div class="col-md-4 text-end">
+            <a href="{{ url_for('user.dashboard') }}" class="btn btn-outline-secondary">
+                ← Back to Dashboard
+            </a>
+        </div>
+    </div>
+
+    <!-- Bookings Table -->
+    {% if all_bookings %}
+    <div class="card border-0 shadow">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-striped table-hover">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Trek Name</th>
+                            <th>Location</th>
+                            <th>Booking Date</th>
+                            <th>Booking Status</th>
+                            <th>Trek Status</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for booking in all_bookings %}
+                        <tr>
+                            <td><strong>{{ booking.trek.name }}</strong></td>
+                            <td>{{ booking.trek.location }}</td>
+                            <td>{{ booking.booking_date.strftime('%d %b %Y') }}</td>
+                            <td>
+                                {% if booking.booking_status == 'Booked' %}
+                                    <span class="badge bg-success">Booked</span>
+                                {% elif booking.booking_status == 'Cancelled' %}
+                                    <span class="badge bg-secondary">Cancelled</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if booking.trek.status.lower() == 'open' %}
+                                    <span class="badge bg-info">Open</span>
+                                {% elif booking.trek.status.lower() == 'closed' %}
+                                    <span class="badge bg-danger">Closed</span>
+                                {% elif booking.trek.status.lower() == 'completed' %}
+                                    <span class="badge bg-success">Completed</span>
+                                {% elif booking.trek.status.lower() == 'pending' %}
+                                    <span class="badge bg-warning text-dark">Pending</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <a href="{{ url_for('user.trek_details', id=booking.trek.id) }}" class="btn btn-sm btn-outline-primary">
+                                    View Trek
+                                </a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    {% else %}
+    <div class="alert alert-info" role="alert">
+        <h5 class="alert-heading">No Bookings Yet</h5>
+        <p class="mb-0">
+            You don't have any bookings yet. 
+            <a href="{{ url_for('user.trek_listing') }}">Start exploring treks</a>!
+        </p>
+    </div>
+    {% endif %}
+
+    <!-- Footer Navigation -->
+    <div class="mt-4">
+        <a href="{{ url_for('user.trek_listing') }}" class="btn btn-primary">
+            Browse More Treks
+        </a>
+        <a href="{{ url_for('user.dashboard') }}" class="btn btn-secondary">
+            ← Back to Dashboard
+        </a>
+    </div>
+</div>
+{% endblock %}
