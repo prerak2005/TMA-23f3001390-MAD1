@@ -1,0 +1,214 @@
+{% extends "base.html" %}
+
+{% block title %}{{ trek.name }} - Trek Details{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    
+    <!-- Back Button -->
+    <div class="mb-3">
+        <a href="{{ url_for('user.trek_listing') }}" class="btn btn-outline-secondary btn-sm">
+            ← Back to Treks
+        </a>
+    </div>
+
+    <!-- Trek Header Card -->
+    <div class="card border-0 shadow mb-4">
+        <div class="card-header bg-primary text-white">
+            <h1 class="mb-0">{{ trek.name }}</h1>
+        </div>
+        <div class="card-body">
+            <!-- Trek Basic Info Row -->
+            <div class="row mb-4">
+                <div class="col-md-6">
+                    <h5>Location</h5>
+                    <p class="lead">{{ trek.location }}</p>
+                </div>
+                <div class="col-md-6">
+                    <h5>Difficulty Level</h5>
+                    <p class="lead">
+                        <span class="badge bg-warning text-dark">{{ trek.difficulty }}</span>
+                    </p>
+                </div>
+            </div>
+
+            <!-- Duration and Dates Row -->
+            <div class="row mb-4">
+                <div class="col-md-4">
+                    <h5>Duration</h5>
+                    <p class="lead">{{ trek.duration }} days</p>
+                </div>
+                <div class="col-md-4">
+                    <h5>Start Date</h5>
+                    <p class="lead">{{ trek.start_date.strftime('%d %b %Y') }}</p>
+                </div>
+                <div class="col-md-4">
+                    <h5>End Date</h5>
+                    <p class="lead">{{ trek.end_date.strftime('%d %b %Y') }}</p>
+                </div>
+            </div>
+
+            <!-- Slots Information -->
+            <div class="row mb-4">
+                <div class="col-md-6">
+                    <h5>Slot Information</h5>
+                    <div class="alert alert-info mb-0">
+                        <p class="mb-2">
+                            <strong>Total Slots:</strong> {{ trek.total_slots }}
+                        </p>
+                        <p class="mb-2">
+                            <strong>Available Slots:</strong> 
+                            <span class="badge bg-success">{{ trek.available_slots }}</span>
+                        </p>
+                        <p class="mb-0">
+                            <strong>Booked Slots:</strong> 
+                            <span class="badge bg-danger">{{ participant_count }}</span>
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Trek Status -->
+                <div class="col-md-6">
+                    <h5>Trek Status</h5>
+                    <div class="alert alert-info mb-0">
+                        <p class="mb-2">
+                            <strong>Current Status:</strong>
+                        </p>
+                        {% if trek.status.lower() == 'open' %}
+                            <span class="badge bg-success fs-6">Open for Booking</span>
+                        {% elif trek.status.lower() == 'pending' %}
+                            <span class="badge bg-warning text-dark fs-6">Pending Approval</span>
+                        {% elif trek.status.lower() == 'closed' %}
+                            <span class="badge bg-danger fs-6">Closed</span>
+                        {% elif trek.status.lower() == 'completed' %}
+                            <span class="badge bg-secondary fs-6">Completed</span>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Staff Information -->
+            {% if trek.assigned_staff %}
+            <div class="row mb-4">
+                <div class="col-md-12">
+                    <h5>Trek Leader</h5>
+                    <div class="alert alert-light border">
+                        <p class="mb-2">
+                            <strong>Name:</strong> {{ trek.assigned_staff.name }}
+                        </p>
+                        <p class="mb-2">
+                            <strong>Email:</strong> {{ trek.assigned_staff.email }}
+                        </p>
+                        {% if trek.assigned_staff.staffprofile %}
+                            <p class="mb-2">
+                                <strong>Specialization:</strong> {{ trek.assigned_staff.staffprofile.specialization }}
+                            </p>
+                            <p class="mb-0">
+                                <strong>Experience:</strong> {{ trek.assigned_staff.staffprofile.experience }} years
+                            </p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Booking Section -->
+    <div class="card border-0 shadow">
+        <div class="card-header bg-success text-white">
+            <h5 class="mb-0">Booking</h5>
+        </div>
+        <div class="card-body">
+            <!-- Already Booked Alert -->
+            {% if user_booking %}
+                <div class="alert alert-warning" role="alert">
+                    <h5 class="alert-heading">You Already Booked This Trek!</h5>
+                    <p class="mb-0">
+                        You booked this trek on <strong>{{ user_booking.booking_date.strftime('%d %b %Y') }}</strong>.
+                        You can view your booking in your 
+                        <a href="{{ url_for('user.booking_history') }}">Booking History</a>.
+                    </p>
+                </div>
+            <!-- Can Book -->
+            {% elif trek.status.lower() == 'open' and trek.available_slots > 0 %}
+                <p class="text-muted mb-3">Ready to book? Click the button below to reserve your spot!</p>
+                <form method="POST" action="{{ url_for('user.book_trek', trek_id=trek.id) }}">
+                    <button type="submit" class="btn btn-success btn-lg w-100">
+                        Book Trek Now
+                    </button>
+                </form>
+            <!-- Cannot Book - Trek Closed -->
+            {% elif trek.status.lower() != 'open' %}
+                <div class="alert alert-danger" role="alert">
+                    <h5 class="alert-heading">Trek Not Available for Booking</h5>
+                    <p class="mb-0">
+                        This trek is currently <strong>{{ trek.status }}</strong> and not accepting new bookings.
+                    </p>
+                </div>
+            <!-- Cannot Book - No Slots -->
+            {% elif trek.available_slots <= 0 %}
+                <div class="alert alert-danger" role="alert">
+                    <h5 class="alert-heading">No Slots Available</h5>
+                    <p class="mb-0">
+                        All slots for this trek have been booked. Try another trek!
+                    </p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Participant List Section -->
+    <div class="card border-0 shadow mt-4">
+        <div class="card-header bg-info text-white">
+            <h5 class="mb-0">Current Participants ({{ participant_count }}/{{ trek.total_slots }})</h5>
+        </div>
+        <div class="card-body">
+            {% if participant_count > 0 %}
+                <div class="table-responsive">
+                    <table class="table table-striped table-hover">
+                        <thead class="table-light">
+                            <tr>
+                                <th>#</th>
+                                <th>Participant Name</th>
+                                <th>Booking Date</th>
+                                <th>Booking Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% set count = 0 %}
+                            {% for booking in trek.bookings %}
+                                {% set count = count + 1 %}
+                                <tr>
+                                    <td>{{ count }}</td>
+                                    <td>{{ booking.user.name }}</td>
+                                    <td>{{ booking.booking_date.strftime('%d %b %Y') }}</td>
+                                    <td>
+                                        {% if booking.booking_status == 'Booked' %}
+                                            <span class="badge bg-success">Booked</span>
+                                        {% elif booking.booking_status == 'Cancelled' %}
+                                            <span class="badge bg-secondary">Cancelled</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <p class="text-muted mb-0">
+                    No participants yet. Be the first to book this trek!
+                </p>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Bottom Navigation -->
+    <div class="mt-4 mb-4">
+        <a href="{{ url_for('user.trek_listing') }}" class="btn btn-outline-secondary">
+            ← Back to Trek List
+        </a>
+    </div>
+
+</div>
+{% endblock %}
