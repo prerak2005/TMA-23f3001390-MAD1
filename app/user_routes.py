@@ -147,7 +147,8 @@ def book_trek(trek_id):
     
 
     # validation 5
-    if trek.start_date <= datetime.now(timezone.utc):
+    today = datetime.now(timezone.utc).date()  # Convert to date for comparison
+    if trek.start_date <= today:
         flash("This trek has already started. You cannot book it.", "danger")
         return redirect(url_for('user.trek_listing'))
     
