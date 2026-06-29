@@ -1,0 +1,136 @@
+{% extends "base.html" %}
+
+{% block title %}Booking Confirmation - TMA{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <!-- Success Header -->
+    <div class="row mb-4">
+        <div class="col-md-8 mx-auto">
+            <div class="alert alert-success" role="alert">
+                <h4 class="alert-heading">Booking Confirmed!</h4>
+                <p class="mb-0">Your trek booking has been successfully created.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Booking Details Card -->
+    <div class="row mb-4">
+        <div class="col-md-8 mx-auto">
+            <div class="card border-0 shadow">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0">Booking Details</h5>
+                </div>
+
+                <div class="card-body">
+                    <!-- Booking ID -->
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <h6 class="text-muted">Booking ID</h6>
+                            <p class="lead">{{ booking.id }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <h6 class="text-muted">Booking Date</h6>
+                            <p class="lead">{{ booking.booking_date.strftime('%d %b %Y, %I:%M %p') }}</p>
+                        </div>
+                    </div>
+
+                    <hr>
+
+                    <!-- Trek Details -->
+                    <h5 class="mb-3">Trek Details</h5>
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <h6 class="text-muted">Trek Name</h6>
+                            <p class="lead">{{ booking.trek.name }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <h6 class="text-muted">Location</h6>
+                            <p class="lead">{{ booking.trek.location }}</p>
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <h6 class="text-muted">Start Date</h6>
+                            <p class="lead">{{ booking.trek.start_date.strftime('%d %b %Y') }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <h6 class="text-muted">End Date</h6>
+                            <p class="lead">{{ booking.trek.end_date.strftime('%d %b %Y') }}</p>
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <h6 class="text-muted">Duration</h6>
+                            <p class="lead">{{ booking.trek.duration }} days</p>
+                        </div>
+                        <div class="col-md-6">
+                            <h6 class="text-muted">Difficulty</h6>
+                            <p class="lead">
+                                <span class="badge bg-warning text-dark">{{ booking.trek.difficulty }}</span>
+                            </p>
+                        </div>
+                    </div>
+
+                    <hr>
+
+                    <!-- Booking Status -->
+                    <h5 class="mb-3">Booking Status</h5>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6 class="text-muted">Booking Status</h6>
+                            <p class="lead">
+                                <span class="badge bg-success fs-6">{{ booking.booking_status }}</span>
+                            </p>
+                        </div>
+                        <div class="col-md-6">
+                            <h6 class="text-muted">Payment Status</h6>
+                            <p class="lead">
+                                <span class="badge bg-warning text-dark fs-6">{{ booking.payment_status }}</span>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Next Steps -->
+    <div class="row mb-4">
+        <div class="col-md-8 mx-auto">
+            <div class="card border-0 shadow bg-light">
+                <div class="card-body">
+                    <h5>Next Steps</h5>
+                    <ul class="mb-0">
+                        <li>Check your email for booking confirmation (coming soon)</li>
+                        <li>Complete payment before the trek starts</li>
+                        <li>Check the booking history for updates</li>
+                        <li>Contact trek leader if you have any questions</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="row">
+        <div class="col-md-8 mx-auto">
+            <div class="d-grid gap-2">
+                <a href="{{ url_for('user.dashboard') }}" class="btn btn-primary btn-lg">
+                    Back to Dashboard
+                </a>
+                <a href="{{ url_for('user.trek_listing') }}" class="btn btn-outline-primary btn-lg">
+                    Browse More Treks
+                </a>
+                <a href="{{ url_for('user.booking_history') }}" class="btn btn-outline-secondary btn-lg">
+                    View Booking History
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
