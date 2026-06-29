@@ -61,7 +61,8 @@ def booking_history():
     
     return render_template(
         'user/booking_history.html',
-        all_bookings=all_bookings
+        all_bookings=all_bookings,
+        now=datetime.now(timezone.utc)
     )
 
 
@@ -90,7 +91,8 @@ def trek_details(id):
     # Check if current user already booked this trek
     user_booking = Booking.query.filter_by(
         user_id=current_user.id,
-        trek_id=id
+        trek_id=id,
+        booking_status='Booked'
     ).first()
     
     return render_template(
@@ -139,7 +141,8 @@ def book_trek(trek_id):
     # validation 4
     existing_booking = Booking.query.filter_by(
         user_id=current_user.id,
-        trek_id=trek_id
+        trek_id=trek_id,
+        booking_status='Booked'
     ).first()
     if existing_booking:
         flash("You already booked this trek! You cannot book the same trek twice.", "warning")
@@ -204,3 +207,61 @@ def booking_confirmation(booking_id):
         'user/booking_confirmation.html',
         booking=booking
     )
+
+
+@user.route('/cancel-booking/<int:booking_id>', methods=['POST'])
+@login_required
+def cancel_booking(booking_id):
+    """
+    Cancel a booking and refund the slot.
+    
+    Process:
+    1. Get booking by id
+    2. Verify booking belongs to current user 
+    3. Check if trek hasn't started yet
+    4. Update booking_status to 'Cancelled'
+    5. Increment available_slots by 1 
+    6. Commit and redirect with success message
+    
+    """
+    
+    from datetime import datetime, timezone
+    
+    # Get booking or 404
+    booking = Booking.query.get_or_404(booking_id)
+    
+    # SECURITY
+    if booking.user_id != current_user.id:
+        flash("Unauthorized access!", "danger")
+        return redirect(url_for('user.dashboard'))
+    
+    # VALIDATION 1
+    if booking.booking_status != 'Booked':
+        flash(f"Cannot cancel a {booking.booking_status} booking.", "warning")
+        return redirect(url_for('user.booking_history'))
+    
+    # VALIDATION 2
+    today = datetime.now(timezone.utc).date()
+    if booking.trek.start_date <= today:
+        flash("Cannot cancel a trek that has already started.", "danger")
+        return redirect(url_for('user.booking_history'))
+    
+    try:
+        # UPDATE BOOKING STATUS
+        booking.booking_status = 'Cancelled'
+        
+        # REFUND THE SLOT
+        booking.trek.available_slots += 1
+        
+        # COMMIT
+        db.session.commit()
+        
+        # SUCCESS MESSAGE
+        flash(f"Successfully cancelled booking for '{booking.trek.name}'. Slot has been refunded.", "success")
+        
+        return redirect(url_for('user.booking_history'))
+    
+    except Exception as e:
+        db.session.rollback()
+        flash(f"Error cancelling booking: {str(e)}", "danger")
+        return redirect(url_for('user.booking_history'))

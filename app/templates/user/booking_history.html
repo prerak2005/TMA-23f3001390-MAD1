@@ -60,6 +60,15 @@
                                 <a href="{{ url_for('user.trek_details', id=booking.trek.id) }}" class="btn btn-sm btn-outline-primary">
                                     View Trek
                                 </a>
+                                
+                                <!-- Cancel Button (only for Booked bookings that haven't started) -->
+                                {% if booking.booking_status == 'Booked' and booking.trek.start_date > now.date() %}
+                                <form method="POST" action="{{ url_for('user.cancel_booking', booking_id=booking.id) }}" style="display:inline;">
+                                    <button type="submit" class="btn btn-sm btn-outline-danger" onclick="return confirm('Are you sure you want to cancel this booking?');">
+                                        Cancel
+                                    </button>
+                                </form>
+                                {% endif %}
                             </td>
                         </tr>
                         {% endfor %}
@@ -82,7 +91,7 @@
     <!-- Footer Navigation -->
     <div class="mt-4">
         <a href="{{ url_for('user.trek_listing') }}" class="btn btn-primary">
-            Browse More Treks
+           ← Browse More Treks
         </a>
         <a href="{{ url_for('user.dashboard') }}" class="btn btn-secondary">
             ← Back to Dashboard
