@@ -17,17 +17,21 @@
     <!-- Search Form -->
      <div class="card mb-4 shadow-sm">
         <div class="card-body">
-            <form method="GET" action="{{ url_for('admin.manage_treks') }}" class="d-flex gap-2">
+            <form method="GET" action="{{ url_for('admin.manage_treks') }}" class="d-flex flex-column flex-md-row gap-2">
                 <input 
                     type="text"
                     name="search"
-                    class="form-control"
+                    class="form-control w-100 flex-md-grow-1"
                     placeholder="Search by Trek name or location"
                     value="{{ search_query }}"
                 >
-                <button type="submit" class="btn btn-outline-primary">Search</button>
+                <div class="d-grid d-md-block flex-shrink-0">
+                    <button type="submit" class="btn btn-outline-primary w-100">Search</button>
+                </div>
                 {% if search_query %}
-                    <a href="{{ url_for('admin.manage_treks') }}" class="btn btn-outline-secondary">Clear</a>
+                    <div class="d-grid d-md-block flex-shrink-0">
+                        <a href="{{ url_for('admin.manage_treks') }}" class="btn btn-outline-secondary w-100">Clear</a>
+                    </div>
                 {% endif %}
             </form>
         </div>

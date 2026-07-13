@@ -20,17 +20,19 @@
     <!-- Search Bar -->
     <div class="row mb-4">
         <div class="col-md-12">
-            <form method="GET" class="d-flex gap-2">
+            <form method="GET" class="d-flex flex-column flex-md-row gap-2">
                 <input 
                     type="text" 
                     name="search" 
-                    class="form-control" 
+                    class="form-control w-100 flex-md-grow-1" 
                     placeholder="Search by trek name or location..."
                     value="{{ search_query }}"
                 >
-                <button type="submit" class="btn btn-primary">
-                    Search
-                </button>
+                <div class="d-grid d-md-block flex-shrink-0">
+                    <button type="submit" class="btn btn-primary w-100">
+                        Search
+                    </button>
+                </div>
             </form>
         </div>
     </div>
