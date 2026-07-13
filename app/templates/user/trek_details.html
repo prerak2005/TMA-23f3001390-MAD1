@@ -99,12 +99,12 @@
                         <p class="mb-2">
                             <strong>Email:</strong> {{ trek.assigned_staff.email }}
                         </p>
-                        {% if trek.assigned_staff.staffprofile %}
+                        {% if trek.assigned_staff.staff_profile %}
                             <p class="mb-2">
-                                <strong>Specialization:</strong> {{ trek.assigned_staff.staffprofile.specialization }}
+                                <strong>Specialization:</strong> {{ trek.assigned_staff.staff_profile.specialization }}
                             </p>
                             <p class="mb-0">
-                                <strong>Experience:</strong> {{ trek.assigned_staff.staffprofile.experience }} years
+                                <strong>Experience:</strong> {{ trek.assigned_staff.staff_profile.experience }} years
                             </p>
                         {% endif %}
                     </div>

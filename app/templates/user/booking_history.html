@@ -26,6 +26,8 @@
                         <tr>
                             <th>Trek Name</th>
                             <th>Location</th>
+                            <th>Start Date</th>
+                            <th>End Date</th>
                             <th>Booking Date</th>
                             <th>Booking Status</th>
                             <th>Trek Status</th>
@@ -37,17 +39,35 @@
                         <tr>
                             <td><strong>{{ booking.trek.name }}</strong></td>
                             <td>{{ booking.trek.location }}</td>
+                            <td>
+                                {% if booking.trek.start_date %}
+                                    {{ booking.trek.start_date.strftime('%d %b %Y') }}
+                                {% else %}
+                                    <span class="text-muted">—</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if booking.trek.end_date %}
+                                    {{ booking.trek.end_date.strftime('%d %b %Y') }}
+                                {% else %}
+                                    <span class="text-muted">—</span>
+                                {% endif %}
+                            </td>
                             <td>{{ booking.booking_date.strftime('%d %b %Y') }}</td>
                             <td>
                                 {% if booking.booking_status == 'Booked' %}
                                     <span class="badge bg-success">Booked</span>
                                 {% elif booking.booking_status == 'Cancelled' %}
                                     <span class="badge bg-secondary">Cancelled</span>
+                                {% elif booking.booking_status == 'Completed' %}
+                                    <span class="badge bg-dark">Completed</span>
                                 {% endif %}
                             </td>
                             <td>
                                 {% if booking.trek.status.lower() == 'open' %}
                                     <span class="badge bg-info">Open</span>
+                                {% elif booking.trek.status.lower() == 'approved' %}
+                                    <span class="badge bg-primary">Approved</span>
                                 {% elif booking.trek.status.lower() == 'closed' %}
                                     <span class="badge bg-danger">Closed</span>
                                 {% elif booking.trek.status.lower() == 'completed' %}
