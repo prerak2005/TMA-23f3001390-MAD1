@@ -6,6 +6,24 @@ from datetime import datetime
 
 staff = Blueprint('staff', __name__, url_prefix='/staff')
 
+# Canonical Title Case status values — must match admin/user routes and seeds so
+# staff queries and writes use the same strings the rest of the app stores in DB.
+TREK_STATUS_TITLE = {
+    'pending': 'Pending',
+    'approved': 'Approved',
+    'open': 'Open',
+    'closed': 'Closed',
+    'completed': 'Completed',
+}
+
+
+def _normalize_trek_status(status):
+    """Map any casing to Title Case trek status, or return as-is if unknown."""
+    if not status:
+        return status
+    return TREK_STATUS_TITLE.get(status.lower(), status)
+
+
 # AUHTORIZATION LAYER(Ensuring staff can access the trekk that are only assigned to them)
 def get_trek_or_404(trek_id):
     '''
@@ -44,9 +62,10 @@ def dashboard():
     # trek stats
     trek_data = []
     for trek in assigned_treks:
+        # Title Case 'Booked' matches user/admin booking flow — lowercase missed real rows
         participant_count = Booking.query.filter_by(
             trek_id=trek.id,
-            booking_status='booked'
+            booking_status='Booked'
         ).count()
         trek_data.append({
             'trek': trek,
@@ -56,8 +75,9 @@ def dashboard():
 
     # calculate stats
     total_treks = len(assigned_treks)
-    open_treks = sum(1 for t in assigned_treks if t.status == 'open')
-    closed_treks = sum(1 for t in assigned_treks if t.status == 'closed')
+    # Title Case matches admin-set trek statuses (Pending/Approved/Open/Closed/Completed)
+    open_treks = sum(1 for t in assigned_treks if t.status == 'Open')
+    closed_treks = sum(1 for t in assigned_treks if t.status == 'Closed')
     total_participants = sum(data['participant_count'] for data in trek_data)
     
     return render_template(
@@ -142,10 +162,10 @@ def update_trek_slots(trek_id):
         flash(f"Available slots cannot exceed total slots ({trek.total_slots})", "error")
         return redirect(url_for('staff.trek_details', trek_id=trek_id))
     
-    # Count current booked participants
+    # Count current booked participants (Title Case matches user-created bookings)
     booked_count = Booking.query.filter_by(
-        trek_id=trek_id, 
-        booking_status='booked'
+        trek_id=trek_id,
+        booking_status='Booked'
     ).count()
     
     # Validate: Cannot reduce below booked count
@@ -175,9 +195,9 @@ def update_trek_status(trek_id):
     '''
     
     Update trek status. Allowed transitions:
-    - open → closed
-    - closed → completed
-    - open → completed (direct)
+    - Open → Closed
+    - Closed → Completed
+    - Open → Completed (direct)
     
     NOT allowed:
     - pending (admin-only)
@@ -192,38 +212,35 @@ def update_trek_status(trek_id):
     '''
 
     trek = get_trek_or_404(trek_id)
-    new_status = request.form.get('status', '').lower()
-    
-    # Convert current status to lowercase for comparison
-    current_status = trek.status.lower()
-    
-    # Define allowed transitions
+    raw_status = request.form.get('status', '').strip()
+    new_status = _normalize_trek_status(raw_status)
+
+    # Staff may only advance Open/Closed treks — Pending/Approved are admin-only
+    current_status = _normalize_trek_status(trek.status)
     valid_transitions = {
-        'open': ['closed', 'completed'],
-        'closed': ['completed'],
-        'completed': [],
+        'Open': ['Closed', 'Completed'],
+        'Closed': ['Completed'],
+        'Completed': [],
     }
-    
-    # Check if current status allows transitions
+
     if current_status not in valid_transitions:
         flash(f"Trek status {trek.status} is not open for staff changes. Admin only.", "error")
         return redirect(url_for('staff.trek_details', trek_id=trek_id))
-    
-    # Check if new status is valid transition
+
     if new_status not in valid_transitions[current_status]:
         allowed = ', '.join(valid_transitions[current_status]) if valid_transitions[current_status] else 'None'
         flash(
-            f"Invalid status transition: {trek.status} → {new_status}. "
+            f"Invalid status transition: {current_status} → {new_status}. "
             f"Allowed: {allowed}",
             "error"
         )
         return redirect(url_for('staff.trek_details', trek_id=trek_id))
-    
-    # Update status
+
+    # Persist Title Case so admin UI and user booking checks stay consistent
     try:
         trek.status = new_status
         db.session.commit()
-        flash(f"Trek status updated to {new_status.title()}", "success")
+        flash(f"Trek status updated to {new_status}", "success")
     except Exception as e:
         db.session.rollback()
         flash(f"Error updating status: {str(e)}", "error")
@@ -242,7 +259,7 @@ def remove_participant(trek_id, booking_id):
     1. Verify trek belongs to current staff
     2. Find booking
     3. Verify booking belongs to this trek
-    4. Set booking_status = 'cancelled'
+    4. Set booking_status = 'Cancelled'
     5. Return slots to trek (increase available_slots)
     6. Commit and redirect
     
@@ -259,13 +276,11 @@ def remove_participant(trek_id, booking_id):
     participant_name = booking.user.name
     
     try:
-        # Check if booking is currently active (booked status)
-        if booking.booking_status == 'booked':
-            # Return slot to trek
+        # Only active Booked reservations hold a slot — Completed/Cancelled must not refund again
+        if booking.booking_status == 'Booked':
             trek.available_slots += 1
-        
-        # Cancel booking
-        booking.booking_status = 'cancelled'
+
+        booking.booking_status = 'Cancelled'
         
         db.session.commit()
         flash(f"Participant {participant_name} removed from trek", "success")

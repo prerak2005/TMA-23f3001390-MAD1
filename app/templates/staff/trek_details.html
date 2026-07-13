@@ -45,15 +45,15 @@
                 <div class="card-body">
                     <h6 class="card-title text-muted">Status</h6>
                     <p class="card-text">
-                        {% if trek.status == 'open' %}
+                        {% if trek.status == 'Open' %}
                             <span class="badge bg-success">Open</span>
-                        {% elif trek.status == 'closed' %}
+                        {% elif trek.status == 'Closed' %}
                             <span class="badge bg-danger">Closed</span>
-                        {% elif trek.status == 'completed' %}
+                        {% elif trek.status == 'Completed' %}
                             <span class="badge bg-dark">Completed</span>
-                        {% elif trek.status == 'pending' %}
+                        {% elif trek.status == 'Pending' %}
                             <span class="badge bg-warning">Pending</span>
-                        {% elif trek.status == 'approved' %}
+                        {% elif trek.status == 'Approved' %}
                             <span class="badge bg-info">Approved</span>
                         {% endif %}
                     </p>
@@ -145,22 +145,22 @@
                                 {% set current_status = trek.status.lower() %}
                                 
                                 {% if current_status == 'open' %}
-                                    <option value="open" selected>Open (Current)</option>
-                                    <option value="closed">→ Closed</option>
-                                    <option value="completed">→ Completed</option>
+                                    <option value="Open" selected>Open (Current)</option>
+                                    <option value="Closed">→ Closed</option>
+                                    <option value="Completed">→ Completed</option>
                                     
                                 {% elif current_status == 'closed' %}
-                                    <option value="closed" selected>Closed (Current)</option>
-                                    <option value="completed">→ Completed</option>
+                                    <option value="Closed" selected>Closed (Current)</option>
+                                    <option value="Completed">→ Completed</option>
                                     
                                 {% elif current_status == 'completed' %}
-                                    <option value="completed" selected>Completed (Final State)</option>
+                                    <option value="Completed" selected>Completed (Final State)</option>
                                     
                                 {% elif current_status == 'pending' %}
-                                    <option value="pending" selected>Pending (Admin Only)</option>
+                                    <option value="Pending" selected>Pending (Admin Only)</option>
                                     
                                 {% elif current_status == 'approved' %}
-                                    <option value="approved" selected>Approved (Admin Only)</option>
+                                    <option value="Approved" selected>Approved (Admin Only)</option>
                                     
                                 {% else %}
                                     <option value="{{ trek.status }}" selected>{{ trek.status }} (Current: Unknown)</option>
@@ -213,23 +213,23 @@
                                         </td>
                                         <td>{{ data.booking.created_at.strftime('%d %b %Y') }}</td>
                                         <td>
-                                            {% if data.booking.booking_status == 'booked' %}
+                                            {% if data.booking.booking_status == 'Booked' %}
                                                 <span class="badge bg-success">Booked</span>
-                                            {% elif data.booking.booking_status == 'cancelled' %}
+                                            {% elif data.booking.booking_status == 'Cancelled' %}
                                                 <span class="badge bg-danger">Cancelled</span>
-                                            {% elif data.booking.booking_status == 'completed' %}
+                                            {% elif data.booking.booking_status == 'Completed' %}
                                                 <span class="badge bg-dark">Completed</span>
                                             {% endif %}
                                         </td>
                                         <td>
-                                            {% if data.booking.payment_status == 'completed' %}
+                                            {% if data.booking.payment_status == 'Completed' %}
                                                 <span class="badge bg-success">Paid</span>
-                                            {% elif data.booking.payment_status == 'pending' %}
+                                            {% elif data.booking.payment_status == 'Pending' %}
                                                 <span class="badge bg-warning">Pending</span>
                                             {% endif %}
                                         </td>
                                         <td>
-                                            {% if data.booking.booking_status == 'booked' %}
+                                            {% if data.booking.booking_status == 'Booked' %}
                                                 <form method="POST" action="{{ url_for('staff.remove_participant', trek_id=trek.id, booking_id=data.booking.id) }}" style="display:inline;">
                                                     <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure you want to remove this participant?');">
                                                         Remove

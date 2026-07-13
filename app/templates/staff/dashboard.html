@@ -81,15 +81,15 @@
                                             <span class="badge bg-secondary">{{ data.trek.difficulty }}</span>
                                         </td>
                                         <td>
-                                            {% if data.trek.status == 'open' %}
+                                            {% if data.trek.status == 'Open' %}
                                                 <span class="badge bg-success">Open</span>
-                                            {% elif data.trek.status == 'closed' %}
+                                            {% elif data.trek.status == 'Closed' %}
                                                 <span class="badge bg-danger">Closed</span>
-                                            {% elif data.trek.status == 'completed' %}
+                                            {% elif data.trek.status == 'Completed' %}
                                                 <span class="badge bg-dark">Completed</span>
-                                            {% elif data.trek.status == 'pending' %}
+                                            {% elif data.trek.status == 'Pending' %}
                                                 <span class="badge bg-warning">Pending</span>
-                                            {% elif data.trek.status == 'approved' %}
+                                            {% elif data.trek.status == 'Approved' %}
                                                 <span class="badge bg-info">Approved</span>
                                             {% endif %}
                                         </td>
