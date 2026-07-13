@@ -51,17 +51,22 @@
                 </div>
             </div>
         </div>
+    </div>
 
-        <!-- Pending Actions -->
-        {% if stats.pending_staff > 0 %}
-        <div class="alert alert-warning alert-dismissible fade show" role="alert">
-            <strong>Pending Approvals:</strong> {{ stats.pending_staff }} staff member(s) awaiting approval.
-             <a href="{{ url_for('admin.view_pending_staff') }}" class="alert-link">Review Now →</a>
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    <!-- Pending Actions -->
+    {% if stats.pending_staff > 0 %}
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                <strong>Pending Approvals:</strong> {{ stats.pending_staff }} staff member(s) awaiting approval.
+                <a href="{{ url_for('admin.view_pending_staff') }}" class="alert-link">Review Now →</a>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
         </div>
-        {% endif %}
+    </div>
+    {% endif %}
 
-        <!-- Quick Links Section -->
+    <!-- Quick Links Section -->
     <div class="row mt-5">
         <div class="col-md-12">
             <h5 class="mb-3">Quick Actions</h5>
