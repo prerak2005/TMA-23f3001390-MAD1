@@ -5,7 +5,7 @@
 {% block content %}
 <div class="container-fluid mt-5">
 
-    <h1 class="mb-4">All Staff Members</h1>
+    <h1 class="page-header mb-4">All Staff Members</h1>
 
     <!-- Navigation -->
     <div class="d-flex flex-wrap gap-2 mb-4">
@@ -105,7 +105,7 @@
     {% else %}
         <!-- No staff found -->
         <div class="alert alert-info" role="alert">
-            No staff members found in the system.
+            <i class="bi bi-signpost-2 empty-state-icon"></i>No staff members found in the system.
         </div>
     {% endif %}
 

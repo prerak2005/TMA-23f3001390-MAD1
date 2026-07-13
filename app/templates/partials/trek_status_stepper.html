@@ -1,0 +1,37 @@
+{# Reusable trek status waypoint stepper. Expects: status (required), compact (optional, default false). #}
+{% if compact is not defined %}{% set compact = false %}{% endif %}
+{% set normalized = status|lower %}
+{% set step_order = {
+    'pending': 0,
+    'approved': 1,
+    'open': 2,
+    'closed': 3,
+    'completed': 4
+} %}
+{% set current = step_order.get(normalized, 0) %}
+{% set steps = [
+    ('pending', 'Pending'),
+    ('approved', 'Approved'),
+    ('open', 'Open'),
+    ('closed', 'Closed'),
+    ('completed', 'Completed')
+] %}
+
+<div
+    class="trek-waypoint-stepper{% if compact %} trek-waypoint-stepper--compact{% endif %}"
+    data-status="{{ normalized }}"
+    role="img"
+    aria-label="Trek status: {{ status }}"
+>
+    <ol class="trek-waypoint-stepper__track">
+        {% for key, label in steps %}
+        <li
+            class="trek-waypoint-stepper__step{% if loop.index0 <= current %} is-reached{% endif %}"
+            data-step="{{ key }}"
+        >
+            <span class="trek-waypoint-stepper__dot" aria-hidden="true"></span>
+            <span class="trek-waypoint-stepper__label{% if compact %} visually-hidden{% endif %}">{{ label }}</span>
+        </li>
+        {% endfor %}
+    </ol>
+</div>

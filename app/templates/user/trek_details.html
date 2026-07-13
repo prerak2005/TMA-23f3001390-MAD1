@@ -36,15 +36,15 @@
             <div class="row mb-4">
                 <div class="col-md-4">
                     <h5>Duration</h5>
-                    <p class="lead">{{ trek.duration }} days</p>
+                    <p class="lead data-mono">{{ trek.duration }} days</p>
                 </div>
                 <div class="col-md-4">
                     <h5>Start Date</h5>
-                    <p class="lead">{{ trek.start_date.strftime('%d %b %Y') }}</p>
+                    <p class="lead data-mono">{{ trek.start_date.strftime('%d %b %Y') }}</p>
                 </div>
                 <div class="col-md-4">
                     <h5>End Date</h5>
-                    <p class="lead">{{ trek.end_date.strftime('%d %b %Y') }}</p>
+                    <p class="lead data-mono">{{ trek.end_date.strftime('%d %b %Y') }}</p>
                 </div>
             </div>
 
@@ -54,15 +54,15 @@
                     <h5>Slot Information</h5>
                     <div class="alert alert-info mb-0">
                         <p class="mb-2">
-                            <strong>Total Slots:</strong> {{ trek.total_slots }}
+                            <strong>Total Slots:</strong> <span class="data-mono">{{ trek.total_slots }}</span>
                         </p>
                         <p class="mb-2">
                             <strong>Available Slots:</strong> 
-                            <span class="badge bg-success">{{ trek.available_slots }}</span>
+                            <span class="badge bg-success data-mono">{{ trek.available_slots }}</span>
                         </p>
                         <p class="mb-0">
                             <strong>Booked Slots:</strong> 
-                            <span class="badge bg-danger">{{ participant_count }}</span>
+                            <span class="badge bg-danger data-mono">{{ participant_count }}</span>
                         </p>
                     </div>
                 </div>
@@ -74,15 +74,9 @@
                         <p class="mb-2">
                             <strong>Current Status:</strong>
                         </p>
-                        {% if trek.status.lower() == 'open' %}
-                            <span class="badge bg-success fs-6">Open for Booking</span>
-                        {% elif trek.status.lower() == 'pending' %}
-                            <span class="badge bg-warning text-dark fs-6">Pending Approval</span>
-                        {% elif trek.status.lower() == 'closed' %}
-                            <span class="badge bg-danger fs-6">Closed</span>
-                        {% elif trek.status.lower() == 'completed' %}
-                            <span class="badge bg-secondary fs-6">Completed</span>
-                        {% endif %}
+                        {% with status=trek.status %}
+                        {% include 'partials/trek_status_stepper.html' %}
+                        {% endwith %}
                     </div>
                 </div>
             </div>
@@ -125,7 +119,7 @@
                 <div class="alert alert-warning" role="alert">
                     <h5 class="alert-heading">You Already Booked This Trek!</h5>
                     <p class="mb-0">
-                        You booked this trek on <strong>{{ user_booking.booking_date.strftime('%d %b %Y') }}</strong>.
+                        You booked this trek on <strong class="data-mono">{{ user_booking.booking_date.strftime('%d %b %Y') }}</strong>.
                         You can view your booking in your 
                         <a href="{{ url_for('user.booking_history') }}">Booking History</a>.
                     </p>
@@ -135,7 +129,7 @@
                 <p class="text-muted mb-3">Ready to book? Click the button below to reserve your spot!</p>
                 <form method="POST" action="{{ url_for('user.book_trek', trek_id=trek.id) }}">
                     <button type="submit" class="btn btn-success btn-lg w-100">
-                        Book Trek Now
+                        <i class="bi bi-calendar-check me-1"></i>Book Trek Now
                     </button>
                 </form>
             <!-- Cannot Book - Trek Closed -->
@@ -161,7 +155,7 @@
     <!-- Participant List Section -->
     <div class="card border-0 shadow mt-4">
         <div class="card-header bg-info text-white">
-            <h5 class="mb-0">Current Participants ({{ participant_count }}/{{ trek.total_slots }})</h5>
+            <h5 class="mb-0">Current Participants (<span class="data-mono">{{ participant_count }}/{{ trek.total_slots }}</span>)</h5>
         </div>
         <div class="card-body">
             {% if participant_count > 0 %}
@@ -180,9 +174,9 @@
                             {% for booking in active_participants %}
                                 {% set count = count + 1 %}
                                 <tr>
-                                    <td>{{ count }}</td>
+                                    <td class="data-mono">{{ count }}</td>
                                     <td>{{ booking.user.name }}</td>
-                                    <td>{{ booking.booking_date.strftime('%d %b %Y') }}</td>
+                                    <td class="data-mono">{{ booking.booking_date.strftime('%d %b %Y') }}</td>
                                     <td>
                                         <span class="badge bg-success">Booked</span>
                                     </td>
@@ -193,7 +187,7 @@
                 </div>
             {% else %}
                 <p class="text-muted mb-0">
-                    No participants yet. Be the first to book this trek!
+                    <i class="bi bi-signpost-2 empty-state-icon"></i>No participants yet. Be the first to book this trek!
                 </p>
             {% endif %}
         </div>

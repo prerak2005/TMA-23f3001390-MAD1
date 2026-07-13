@@ -3,7 +3,7 @@
 {% block title %}Admin Dashboard{% endblock %}
 
 {% block content %}
-<h1 class="mb-4">Admin Dashboard</h1>
+<h1 class="page-header mb-4">Admin Dashboard</h1>
 
 <!-- Stats Row -->
 <div class="row g-3 mb-4">
@@ -61,53 +61,90 @@
 </div>
 {% endif %}
 
-<!-- Quick Links Section -->
-<div class="row mt-2">
-    <div class="col-12">
-        <h5 class="mb-3">Quick Actions</h5>
-
-        <div class="mb-3">
-            <h6 class="text-muted">Trek Management</h6>
-            <div class="d-flex flex-wrap gap-2">
-                <a href="{{ url_for('admin.manage_treks') }}" class="btn btn-primary btn-sm">
-                    <i class="bi bi-mountain"></i> Manage Treks
-                </a>
-                <a href="{{ url_for('admin.create_trek') }}" class="btn btn-success btn-sm">
-                    <i class="bi bi-plus-circle"></i> Create Trek
-                </a>
+<!-- Quick Actions -->
+<h2 class="h5 quick-actions-heading mb-3">Quick Actions</h2>
+<div class="row g-3">
+    <div class="col-12 col-md-6">
+        <div class="card quick-action-card h-100">
+            <div class="card-body">
+                <div class="quick-action-card__header">
+                    <span class="quick-action-card__icon" aria-hidden="true"><i class="bi bi-map"></i></span>
+                    <h6 class="quick-action-card__title mb-0">Trek Management</h6>
+                </div>
+                <div class="quick-action-list">
+                    <a href="{{ url_for('admin.manage_treks') }}" class="quick-action-link">
+                        <i class="bi bi-mountain"></i>
+                        <span>Manage Treks</span>
+                        <i class="bi bi-chevron-right quick-action-link__arrow"></i>
+                    </a>
+                    <a href="{{ url_for('admin.create_trek') }}" class="quick-action-link">
+                        <i class="bi bi-plus-lg"></i>
+                        <span>Create Trek</span>
+                        <i class="bi bi-chevron-right quick-action-link__arrow"></i>
+                    </a>
+                </div>
             </div>
         </div>
+    </div>
 
-        <div class="mb-3">
-            <h6 class="text-muted">Staff Management</h6>
-            <div class="d-flex flex-wrap gap-2">
-                <a href="{{ url_for('admin.view_pending_staff') }}" class="btn btn-warning btn-sm">
-                    <i class="bi bi-clock-history"></i> Pending Approvals
-                    {% if stats.pending_staff > 0 %}
-                        <span class="badge bg-danger">{{ stats.pending_staff }}</span>
-                    {% endif %}
-                </a>
-                <a href="{{ url_for('admin.view_all_staff') }}" class="btn btn-info btn-sm">
-                    <i class="bi bi-people"></i> View All Staff
-                </a>
+    <div class="col-12 col-md-6">
+        <div class="card quick-action-card h-100{% if stats.pending_staff > 0 %} quick-action-card--attention{% endif %}">
+            <div class="card-body">
+                <div class="quick-action-card__header">
+                    <span class="quick-action-card__icon" aria-hidden="true"><i class="bi bi-person-badge"></i></span>
+                    <h6 class="quick-action-card__title mb-0">Staff Management</h6>
+                </div>
+                <div class="quick-action-list">
+                    <a href="{{ url_for('admin.view_pending_staff') }}" class="quick-action-link">
+                        <i class="bi bi-clock-history"></i>
+                        <span>Pending Approvals</span>
+                        {% if stats.pending_staff > 0 %}
+                            <span class="badge bg-danger ms-1">{{ stats.pending_staff }}</span>
+                        {% endif %}
+                        <i class="bi bi-chevron-right quick-action-link__arrow"></i>
+                    </a>
+                    <a href="{{ url_for('admin.view_all_staff') }}" class="quick-action-link">
+                        <i class="bi bi-people"></i>
+                        <span>View All Staff</span>
+                        <i class="bi bi-chevron-right quick-action-link__arrow"></i>
+                    </a>
+                </div>
             </div>
         </div>
+    </div>
 
-        <div class="mb-3">
-            <h6 class="text-muted">User Management</h6>
-            <div class="d-flex flex-wrap gap-2">
-                <a href="{{ url_for('admin.manage_users') }}" class="btn btn-success btn-sm">
-                    <i class="bi bi-people"></i> Manage Users
-                </a>
+    <div class="col-12 col-md-6">
+        <div class="card quick-action-card h-100">
+            <div class="card-body">
+                <div class="quick-action-card__header">
+                    <span class="quick-action-card__icon" aria-hidden="true"><i class="bi bi-person-lines-fill"></i></span>
+                    <h6 class="quick-action-card__title mb-0">User Management</h6>
+                </div>
+                <div class="quick-action-list">
+                    <a href="{{ url_for('admin.manage_users') }}" class="quick-action-link">
+                        <i class="bi bi-people"></i>
+                        <span>Manage Users</span>
+                        <i class="bi bi-chevron-right quick-action-link__arrow"></i>
+                    </a>
+                </div>
             </div>
         </div>
+    </div>
 
-        <div class="mb-3">
-            <h6 class="text-muted">Booking Management</h6>
-            <div class="d-flex flex-wrap gap-2">
-                <a href="{{ url_for('admin.manage_bookings') }}" class="btn btn-info btn-sm">
-                    <i class="bi bi-calendar2-event"></i> View Bookings
-                </a>
+    <div class="col-12 col-md-6">
+        <div class="card quick-action-card h-100">
+            <div class="card-body">
+                <div class="quick-action-card__header">
+                    <span class="quick-action-card__icon" aria-hidden="true"><i class="bi bi-journal-check"></i></span>
+                    <h6 class="quick-action-card__title mb-0">Booking Management</h6>
+                </div>
+                <div class="quick-action-list">
+                    <a href="{{ url_for('admin.manage_bookings') }}" class="quick-action-link">
+                        <i class="bi bi-calendar2-event"></i>
+                        <span>View Bookings</span>
+                        <i class="bi bi-chevron-right quick-action-link__arrow"></i>
+                    </a>
+                </div>
             </div>
         </div>
     </div>

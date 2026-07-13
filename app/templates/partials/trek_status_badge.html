@@ -1,0 +1,15 @@
+{# Reusable trek status badge for table/list views. Expects: status (required). #}
+{% set normalized = status|lower %}
+{% if normalized == 'open' %}
+    <span class="badge bg-info">{{ status }}</span>
+{% elif normalized == 'approved' %}
+    <span class="badge bg-primary">{{ status }}</span>
+{% elif normalized == 'closed' %}
+    <span class="badge bg-danger">{{ status }}</span>
+{% elif normalized == 'completed' %}
+    <span class="badge bg-success">{{ status }}</span>
+{% elif normalized == 'pending' %}
+    <span class="badge bg-warning text-dark">{{ status }}</span>
+{% else %}
+    <span class="badge bg-secondary">{{ status }}</span>
+{% endif %}

@@ -5,7 +5,7 @@
 {% block content %}
 <div class="container-fluid mt-5">
 
-    <h1 class="mb-4">Pending Staff Approvals</h1>
+    <h1 class="page-header mb-4">Pending Staff Approvals</h1>
 
     <!-- Navigation -->
     <div class="d-flex flex-wrap gap-2 mb-4">
@@ -73,7 +73,7 @@
     {% else %}
         <!-- No pending staff -->
         <div class="alert alert-success" role="alert">
-            ✓ No pending staff approvals. All applications have been reviewed.
+            <i class="bi bi-signpost-2 empty-state-icon"></i>No pending staff approvals. All applications have been reviewed.
         </div>
     {% endif %}
 

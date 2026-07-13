@@ -4,7 +4,7 @@
 <!-- Page Header -->
 <div class="row mb-4">
     <div class="col-12">
-        <h1>Staff Dashboard</h1>
+        <h1 class="page-header">Staff Dashboard</h1>
         <p class="text-muted mb-0">Welcome, {{ current_user.name }}. Manage your assigned treks below.</p>
     </div>
 </div>
@@ -15,7 +15,7 @@
         <div class="card border-primary shadow-sm h-100">
             <div class="card-body">
                 <h6 class="card-title text-muted">Total Treks</h6>
-                <h2 class="card-text text-primary mb-0">{{ total_treks }}</h2>
+                <h2 class="card-text text-primary mb-0 data-mono">{{ total_treks }}</h2>
             </div>
         </div>
     </div>
@@ -24,7 +24,7 @@
         <div class="card border-success shadow-sm h-100">
             <div class="card-body">
                 <h6 class="card-title text-muted">Open Treks</h6>
-                <h2 class="card-text text-success mb-0">{{ open_treks }}</h2>
+                <h2 class="card-text text-success mb-0 data-mono">{{ open_treks }}</h2>
             </div>
         </div>
     </div>
@@ -33,7 +33,7 @@
         <div class="card border-warning shadow-sm h-100">
             <div class="card-body">
                 <h6 class="card-title text-muted">Closed Treks</h6>
-                <h2 class="card-text text-warning mb-0">{{ closed_treks }}</h2>
+                <h2 class="card-text text-warning mb-0 data-mono">{{ closed_treks }}</h2>
             </div>
         </div>
     </div>
@@ -42,7 +42,7 @@
         <div class="card border-info shadow-sm h-100">
             <div class="card-body">
                 <h6 class="card-title text-muted">Total Participants</h6>
-                <h2 class="card-text text-info mb-0">{{ total_participants }}</h2>
+                <h2 class="card-text text-info mb-0 data-mono">{{ total_participants }}</h2>
             </div>
         </div>
     </div>
@@ -80,21 +80,13 @@
                                         <span class="badge bg-secondary">{{ data.trek.difficulty }}</span>
                                     </td>
                                     <td>
-                                        {% if data.trek.status == 'Open' %}
-                                            <span class="badge bg-success">Open</span>
-                                        {% elif data.trek.status == 'Closed' %}
-                                            <span class="badge bg-danger">Closed</span>
-                                        {% elif data.trek.status == 'Completed' %}
-                                            <span class="badge bg-dark">Completed</span>
-                                        {% elif data.trek.status == 'Pending' %}
-                                            <span class="badge bg-warning">Pending</span>
-                                        {% elif data.trek.status == 'Approved' %}
-                                            <span class="badge bg-info">Approved</span>
-                                        {% endif %}
+                                        {% with status=data.trek.status %}
+                                        {% include 'partials/trek_status_badge.html' %}
+                                        {% endwith %}
                                     </td>
-                                    <td>{{ data.participant_count }}</td>
-                                    <td>{{ data.available_slots }} / {{ data.trek.total_slots }}</td>
-                                    <td>{{ data.trek.start_date.strftime('%d %b %Y') }}</td>
+                                    <td class="data-mono">{{ data.participant_count }}</td>
+                                    <td class="data-mono">{{ data.available_slots }} / {{ data.trek.total_slots }}</td>
+                                    <td class="data-mono">{{ data.trek.start_date.strftime('%d %b %Y') }}</td>
                                     <td>
                                         <a href="{{ url_for('staff.trek_details', trek_id=data.trek.id) }}" class="btn btn-sm btn-primary">
                                             Manage
@@ -107,7 +99,7 @@
                 </div>
             {% else %}
                 <div class="card-body">
-                    <p class="text-muted text-center mb-0">No treks assigned to you yet.</p>
+                    <p class="text-muted text-center mb-0"><i class="bi bi-signpost-2 empty-state-icon"></i>No treks assigned to you yet.</p>
                 </div>
             {% endif %}
         </div>

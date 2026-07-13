@@ -27,11 +27,11 @@
                     <div class="row mb-3">
                         <div class="col-md-6">
                             <h6 class="text-muted">Booking ID</h6>
-                            <p class="lead">{{ booking.id }}</p>
+                            <p class="lead data-mono mb-0">{{ booking.id }}</p>
                         </div>
                         <div class="col-md-6">
                             <h6 class="text-muted">Booking Date</h6>
-                            <p class="lead">{{ booking.booking_date.strftime('%d %b %Y, %I:%M %p') }}</p>
+                            <p class="lead data-mono mb-0">{{ booking.booking_date.strftime('%d %b %Y, %I:%M %p') }}</p>
                         </div>
                     </div>
 
@@ -54,18 +54,18 @@
                     <div class="row mb-3">
                         <div class="col-md-6">
                             <h6 class="text-muted">Start Date</h6>
-                            <p class="lead">{{ booking.trek.start_date.strftime('%d %b %Y') }}</p>
+                            <p class="lead data-mono mb-0">{{ booking.trek.start_date.strftime('%d %b %Y') }}</p>
                         </div>
                         <div class="col-md-6">
                             <h6 class="text-muted">End Date</h6>
-                            <p class="lead">{{ booking.trek.end_date.strftime('%d %b %Y') }}</p>
+                            <p class="lead data-mono mb-0">{{ booking.trek.end_date.strftime('%d %b %Y') }}</p>
                         </div>
                     </div>
 
                     <div class="row mb-3">
                         <div class="col-md-6">
                             <h6 class="text-muted">Duration</h6>
-                            <p class="lead">{{ booking.trek.duration }} days</p>
+                            <p class="lead data-mono mb-0">{{ booking.trek.duration }} days</p>
                         </div>
                         <div class="col-md-6">
                             <h6 class="text-muted">Difficulty</h6>

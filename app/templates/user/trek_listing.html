@@ -7,7 +7,7 @@
     <!-- Page Header -->
     <div class="row mb-4 align-items-center">
         <div class="col-12 col-md-8">
-            <h1>Available Treks</h1>
+            <h1 class="page-header">Available Treks</h1>
             <p class="text-muted mb-0">Browse and book your next trekking adventure</p>
         </div>
         <div class="col-12 col-md-4 text-end mt-2 mt-md-0">
@@ -41,7 +41,7 @@
     <div class="row mb-3">
         <div class="col-md-12">
             <p class="text-muted">
-                Found <strong>{{ treks|length }}</strong> trek(s)
+                Found <strong class="data-mono">{{ treks|length }}</strong> trek(s)
                 {% if search_query %}
                     matching "<strong>{{ search_query }}</strong>"
                 {% endif %}
@@ -79,13 +79,13 @@
                         <!-- Duration -->
                         <p class="card-text">
                             <strong>Duration:</strong><br>
-                            {{ trek.duration }} days
+                            <span class="data-mono">{{ trek.duration }} days</span>
                         </p>
 
                         <!-- Available Slots -->
                         <p class="card-text">
                             <strong>Available Slots:</strong><br>
-                            <span class="badge bg-success">
+                            <span class="badge bg-success data-mono">
                                 {{ trek.available_slots }} / {{ trek.total_slots }}
                             </span>
                         </p>
@@ -93,7 +93,7 @@
                         <!-- Start Date -->
                         <p class="card-text">
                             <strong>Start Date:</strong><br>
-                            {{ trek.start_date.strftime('%d %b %Y') }}
+                            <span class="data-mono">{{ trek.start_date.strftime('%d %b %Y') }}</span>
                         </p>
 
                         <!-- Staff Name -->
@@ -128,7 +128,7 @@
     <!-- No Treks Found -->
     {% else %}
         <div class="alert alert-info" role="alert">
-            <h5>No Treks Available</h5>
+            <h5><i class="bi bi-signpost-2 empty-state-icon"></i>No Treks Available</h5>
             <p>
                 {% if search_query %}
                     No treks match your search for "<strong>{{ search_query }}</strong>".

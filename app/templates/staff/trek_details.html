@@ -44,17 +44,9 @@
                 <div class="card-body">
                     <h6 class="card-title text-muted">Status</h6>
                     <p class="card-text">
-                        {% if trek.status == 'Open' %}
-                            <span class="badge bg-success">Open</span>
-                        {% elif trek.status == 'Closed' %}
-                            <span class="badge bg-danger">Closed</span>
-                        {% elif trek.status == 'Completed' %}
-                            <span class="badge bg-dark">Completed</span>
-                        {% elif trek.status == 'Pending' %}
-                            <span class="badge bg-warning">Pending</span>
-                        {% elif trek.status == 'Approved' %}
-                            <span class="badge bg-info">Approved</span>
-                        {% endif %}
+                        {% with status=trek.status %}
+                        {% include 'partials/trek_status_badge.html' %}
+                        {% endwith %}
                     </p>
                 </div>
             </div>
@@ -87,7 +79,7 @@
         <div class="col-md-6">
             <div class="card border-info shadow-sm">
                 <div class="card-header bg-info text-white">
-                    <h5 class="mb-0">Slots Information</h5>
+                    <h5 class="mb-0"><i class="bi bi-people me-1"></i> Slots Information</h5>
                 </div>
                 <div class="card-body">
                     <p><strong>Total Slots:</strong> {{ trek.total_slots }}</p>
@@ -107,7 +99,7 @@
         <div class="col-md-6">
             <div class="card border-warning shadow-sm">
                 <div class="card-header bg-warning">
-                    <h5 class="mb-0">Update Available Slots</h5>
+                    <h5 class="mb-0"><i class="bi bi-sliders me-1"></i> Update Available Slots</h5>
                 </div>
                 <div class="card-body">
                    <form method="POST" action="{{ url_for('staff.update_trek_slots', trek_id=trek.id) }}">
@@ -131,7 +123,7 @@
         <div class="col-md-6">
             <div class="card border-primary shadow-sm">
                 <div class="card-header bg-primary text-white">
-                    <h5 class="mb-0">Change Trek Status</h5>
+                    <h5 class="mb-0"><i class="bi bi-arrow-repeat me-1"></i> Change Trek Status</h5>
                 </div>
                 <div class="card-body">
                     <form method="POST" action="{{ url_for('staff.update_trek_status', trek_id=trek.id) }}">
@@ -181,7 +173,7 @@
         <div class="col-md-12">
             <div class="card shadow-sm">
                 <div class="card-header bg-success text-white">
-                    <h5 class="mb-0">Registered Participants ({{ participant_count }})</h5>
+                    <h5 class="mb-0"><i class="bi bi-person-check me-1"></i> Registered Participants ({{ participant_count }})</h5>
                 </div>
 
                 {% if participants %}

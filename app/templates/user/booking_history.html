@@ -6,7 +6,7 @@
 <div class="container mt-5">
     <div class="row mb-4">
         <div class="col-12">
-            <h1>Booking History</h1>
+            <h1 class="page-header">Booking History</h1>
             <p class="text-muted mb-0">View all your trek bookings</p>
         </div>
     </div>
@@ -80,7 +80,7 @@
                                 {% if booking.booking_status == 'Booked' and booking.trek.start_date > now.date() %}
                                 <form method="POST" action="{{ url_for('user.cancel_booking', booking_id=booking.id) }}" style="display:inline;">
                                     <button type="submit" class="btn btn-sm btn-outline-danger" onclick="return confirm('Are you sure you want to cancel this booking?');">
-                                        Cancel
+                                        <i class="bi bi-x-circle me-1"></i>Cancel
                                     </button>
                                 </form>
                                 {% endif %}
@@ -95,7 +95,7 @@
 
     {% else %}
     <div class="alert alert-info" role="alert">
-        <h5 class="alert-heading">No Bookings Yet</h5>
+        <h5 class="alert-heading"><i class="bi bi-signpost-2 empty-state-icon"></i>No Bookings Yet</h5>
         <p class="mb-0">
             You don't have any bookings yet. 
             <a href="{{ url_for('user.trek_listing') }}">Start exploring treks</a>!

@@ -6,10 +6,10 @@
 <div class="container-fluid mt-5">
     <div class="row mb-4 align-items-center">
         <div class="col-12 col-md-6">
-            <h2>Manage Treks</h2>
+            <h2 class="page-header">Manage Treks</h2>
         </div>
         <div class="col-12 col-md-6 text-end mt-2 mt-md-0">
-            <a href="{{ url_for('admin.create_trek') }}" class="btn btn-primary">Create New Trek</a>
+            <a href="{{ url_for('admin.create_trek') }}" class="btn btn-primary"><i class="bi bi-plus-lg me-1"></i>Create New Trek</a>
         </div>
     </div>
 
@@ -79,58 +79,42 @@
                                 <span class="badge bg-danger">{{ trek.difficulty }}</span>
                             {% endif %}
                         </td>
-                        <td>{{ trek.duration }}</td>
-                        <td>
-                            <small>
-                                {{ trek.start_date.strftime('%d-%m-%Y') }}<br>
-                                to<br>
-                                {{ trek.end_date.strftime('%d-%m-%Y') }}
-                            </small>
+                        <td class="data-mono">{{ trek.duration }}</td>
+                        <td class="data-mono text-nowrap">
+                            <small>{{ trek.start_date.strftime('%d %b %Y') }} – {{ trek.end_date.strftime('%d %b %Y') }}</small>
                         </td>
                         <td>
-                            <span class="badge bg-primary">
-                                {{ trek.available_slots }} / {{ trek.total_slots }}
-                            </span>
-                        </td>
-                         <td>
-                            <span class="badge bg-primary">
+                            <span class="badge bg-primary data-mono">
                                 {{ trek.available_slots }} / {{ trek.total_slots }}
                             </span>
                         </td>
                         <td>
-                            <div class="btn-group btn-group-sm" role="group">
+                            {% with status=trek.status %}
+                            {% include 'partials/trek_status_badge.html' %}
+                            {% endwith %}
+                        </td>
+                        <td>
+                            <div class="table-actions">
                                 {% if trek.status == 'Pending' %}
-                                <span class="badge bg-secondary">{{ trek.status }}</span>
-                                <form method="POST" action="{{ url_for('admin.update_trek_status', trek_id=trek.id, new_status='Approved') }}" style="display:inline;">
+                                <form method="POST" action="{{ url_for('admin.update_trek_status', trek_id=trek.id, new_status='Approved') }}">
                                     <button type="submit" class="btn btn-sm btn-outline-success" title="Approve Trek">Approve</button>
                                 </form>
-
                                 {% elif trek.status == 'Approved' %}
-                                <span class="badge bg-secondary">{{ trek.status }}</span>
-                                <form method="POST" action="{{ url_for('admin.update_trek_status', trek_id=trek.id, new_status='Open') }}" style="display:inline;">
+                                <form method="POST" action="{{ url_for('admin.update_trek_status', trek_id=trek.id, new_status='Open') }}">
                                     <button type="submit" class="btn btn-sm btn-outline-success" title="Open for Booking">Open</button>
                                 </form>
-
                                 {% elif trek.status == 'Open' %}
-                                <span class="badge bg-secondary">{{ trek.status }}</span>
-                                <form method="POST" action="{{ url_for('admin.update_trek_status', trek_id=trek.id, new_status='Closed') }}" style="display:inline;">
+                                <form method="POST" action="{{ url_for('admin.update_trek_status', trek_id=trek.id, new_status='Closed') }}">
                                     <button type="submit" class="btn btn-sm btn-outline-success" title="Close Trek">Close</button>
                                 </form>
-
                                 {% elif trek.status == 'Closed' %}
-                                <span class="badge bg-secondary">{{ trek.status }}</span>
-                                <form method="POST" action="{{ url_for('admin.update_trek_status', trek_id=trek.id, new_status='Completed') }}" style="display:inline;">
+                                <form method="POST" action="{{ url_for('admin.update_trek_status', trek_id=trek.id, new_status='Completed') }}">
                                     <button type="submit" class="btn btn-sm btn-outline-success" title="Mark Complete">Complete</button>
                                 </form>
-
-                                {% elif trek.status == 'Completed' %}
-                                    <span class="badge bg-dark">{{ trek.status }}</span>
                                 {% endif %}
+                                <a href="{{ url_for('admin.edit_trek', trek_id=trek.id) }}" class="btn btn-sm btn-warning" title="Edit Trek">Edit</a>
+                                <a href="{{ url_for('admin.delete_trek_confirm', trek_id=trek.id) }}" class="btn btn-sm btn-danger" title="Delete Trek">Delete</a>
                             </div>
-                        </td>
-                        <td>
-                            <a href="{{ url_for('admin.edit_trek', trek_id=trek.id) }}" class="btn btn-sm btn-warning" title="Edit Trek">Edit</a>
-                            <a href="{{ url_for('admin.delete_trek_confirm', trek_id=trek.id) }}" class="btn btn-sm btn-danger" title="Delete Trek">Delete</a>
                         </td>
                     </tr>
                     {% endfor %}
@@ -139,11 +123,11 @@
         </div>
     {% else %}
         <div class="alert alert-warning text-center py-5">
-            <h5>No Treks Found</h5>
+            <h5><i class="bi bi-signpost-2 empty-state-icon"></i>No Treks Found</h5>
             {% if search_query %}
                 <p>Try a different search term or <a href="{{ url_for('admin.manage_treks') }}">view all treks</a></p>
             {% else %}
-                <p><a href="{{ url_for('admin.create_trek') }}" class="btn btn-primary mt-2">Create your first trek</a></p>
+                <p><a href="{{ url_for('admin.create_trek') }}" class="btn btn-primary mt-2"><i class="bi bi-plus-lg me-1"></i>Create your first trek</a></p>
             {% endif %}
         </div>
     {% endif %}
