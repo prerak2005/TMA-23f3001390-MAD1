@@ -103,12 +103,14 @@ def trek_details(trek_id):
     """
     trek = get_trek_or_404(trek_id)
     
-    # Get all bookings for this trek (all participants)
-    bookings = Booking.query.filter_by(trek_id=trek_id).all()
+    # Booked-only for display/count — Cancelled/Completed still exist in DB for admin/history views
+    active_bookings = Booking.query.filter_by(
+        trek_id=trek_id,
+        booking_status='Booked'
+    ).all()
     
-    # Enrich booking data with user details
     participants = []
-    for booking in bookings:
+    for booking in active_bookings:
         user = User.query.get(booking.user_id)
         participants.append({
             'booking': booking,
@@ -119,7 +121,7 @@ def trek_details(trek_id):
         'staff/trek_details.html',
         trek=trek,
         participants=participants,
-        participant_count=len(participants)
+        participant_count=len(active_bookings)
     )
 
 

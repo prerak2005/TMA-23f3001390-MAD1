@@ -177,18 +177,14 @@
                         </thead>
                         <tbody>
                             {% set count = 0 %}
-                            {% for booking in trek.bookings %}
+                            {% for booking in active_participants %}
                                 {% set count = count + 1 %}
                                 <tr>
                                     <td>{{ count }}</td>
                                     <td>{{ booking.user.name }}</td>
                                     <td>{{ booking.booking_date.strftime('%d %b %Y') }}</td>
                                     <td>
-                                        {% if booking.booking_status == 'Booked' %}
-                                            <span class="badge bg-success">Booked</span>
-                                        {% elif booking.booking_status == 'Cancelled' %}
-                                            <span class="badge bg-secondary">Cancelled</span>
-                                        {% endif %}
+                                        <span class="badge bg-success">Booked</span>
                                     </td>
                                 </tr>
                             {% endfor %}

@@ -9,7 +9,25 @@ user = Blueprint('user', __name__, url_prefix='/user')
 @user.route('/dashboard')
 @login_required
 def dashboard():
-    return render_template('user/dashboard.html')
+    today = datetime.now(timezone.utc).date()
+
+    # Active reservations only — Cancelled/Completed stay in booking_history, not the dashboard cards
+    user_bookings = Booking.query.filter_by(
+        user_id=current_user.id,
+        booking_status='Booked'
+    ).order_by(Booking.booking_date.desc()).all()
+
+    # Treks the trekker is booked on that have not started yet
+    upcoming_treks = sum(
+        1 for booking in user_bookings
+        if booking.trek.start_date and booking.trek.start_date > today
+    )
+
+    return render_template(
+        'user/dashboard.html',
+        user_bookings=user_bookings,
+        upcoming_treks=upcoming_treks
+    )
 
 
 @user.route('/treks', methods=['GET'])
@@ -84,9 +102,12 @@ def trek_details(id):
     # Get trek or show 404
     trek = Trek.query.get_or_404(id)
     
-    # Get all bookings for this trek (for participant count)
-    bookings = Booking.query.filter_by(trek_id=id).all()
-    participant_count = len(bookings)
+    # Only Booked rows count as current participants — Cancelled/Completed remain in booking_history
+    active_bookings = Booking.query.filter_by(
+        trek_id=id,
+        booking_status='Booked'
+    ).all()
+    participant_count = len(active_bookings)
     
     # Check if current user already booked this trek
     user_booking = Booking.query.filter_by(
@@ -99,6 +120,7 @@ def trek_details(id):
         'user/trek_details.html',
         trek=trek,
         participant_count=participant_count,
+        active_participants=active_bookings,
         user_booking=user_booking
     )
 
