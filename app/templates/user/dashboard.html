@@ -3,90 +3,90 @@
 {% block title %}User Dashboard - TMA{% endblock %}
 
 {% block content %}
-<div class="container mt-5">
-    <h1>Welcome, {{ current_user.name }}!</h1>
-    <p class="text-muted">Your trekking dashboard</p>
+<h1 class="mb-2">Welcome, {{ current_user.name }}!</h1>
+<p class="text-muted mb-4">Your trekking dashboard</p>
 
-    <!-- Stats Cards -->
-    <div class="row mb-4 mt-4">
-        <div class="col-md-3">
-            <div class="card text-center shadow-sm">
-                <div class="card-body">
-                    <h5 class="card-title">Treks Booked</h5>
-                    <h2 class="text-primary">{{ user_bookings|length }}</h2>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="card text-center shadow-sm">
-                <div class="card-body">
-                    <h5 class="card-title">Upcoming</h5>
-                    <h2 class="text-success">{{ upcoming_treks }}</h2>
-                </div>
+<!-- Stats Cards -->
+<div class="row g-3 mb-4">
+    <div class="col-12 col-sm-6 col-md-6">
+        <div class="card border-primary shadow-sm h-100">
+            <div class="card-body">
+                <h6 class="card-title text-muted">Treks Booked</h6>
+                <h2 class="card-text text-primary mb-0">{{ user_bookings|length }}</h2>
+                <p class="text-muted small mb-0">Active reservations</p>
             </div>
         </div>
     </div>
-
-    <!-- Booked Treks Section -->
-    <div class="card border-0 shadow mb-4">
-        <div class="card-header bg-primary text-white">
-            <h5 class="mb-0">My Booked Treks</h5>
+    <div class="col-12 col-sm-6 col-md-6">
+        <div class="card border-success shadow-sm h-100">
+            <div class="card-body">
+                <h6 class="card-title text-muted">Upcoming</h6>
+                <h2 class="card-text text-success mb-0">{{ upcoming_treks }}</h2>
+                <p class="text-muted small mb-0">Treks not yet started</p>
+            </div>
         </div>
-        <div class="card-body">
-            {% if user_bookings %}
-                <div class="row g-3">
-                    {% for booking in user_bookings %}
-                    <div class="col-md-4">
-                        <div class="card border h-100">
-                            <div class="card-header bg-light">
-                                <h6 class="mb-0">{{ booking.trek.name }}</h6>
-                            </div>
-                            <div class="card-body">
-                                <p class="mb-2">
-                                    <strong>Location:</strong><br>
-                                    {{ booking.trek.location }}
-                                </p>
-                                <p class="mb-2">
-                                    <strong>Start Date:</strong><br>
-                                    {{ booking.trek.start_date.strftime('%d %b %Y') }}
-                                </p>
-                                <p class="mb-0">
-                                    <strong>Booked on:</strong><br>
-                                    {{ booking.booking_date.strftime('%d %b %Y') }}
-                                </p>
-                            </div>
-                            <div class="card-footer bg-light">
-                                <a href="{{ url_for('user.trek_details', id=booking.trek.id) }}" class="btn btn-sm btn-primary">
-                                    View Details
-                                </a>
-                            </div>
+    </div>
+</div>
+
+<!-- Booked Treks Section -->
+<div class="card shadow-sm mb-4">
+    <div class="card-header bg-primary text-white">
+        <h5 class="mb-0">My Booked Treks</h5>
+    </div>
+    <div class="card-body">
+        {% if user_bookings %}
+            <div class="row g-3">
+                {% for booking in user_bookings %}
+                <div class="col-md-4">
+                    <div class="card border h-100 shadow-sm">
+                        <div class="card-header bg-light">
+                            <h6 class="mb-0">{{ booking.trek.name }}</h6>
+                        </div>
+                        <div class="card-body">
+                            <p class="mb-2">
+                                <strong>Location:</strong><br>
+                                {{ booking.trek.location }}
+                            </p>
+                            <p class="mb-2">
+                                <strong>Start Date:</strong><br>
+                                {{ booking.trek.start_date.strftime('%d %b %Y') }}
+                            </p>
+                            <p class="mb-0">
+                                <strong>Booked on:</strong><br>
+                                {{ booking.booking_date.strftime('%d %b %Y') }}
+                            </p>
+                        </div>
+                        <div class="card-footer bg-light">
+                            <a href="{{ url_for('user.trek_details', id=booking.trek.id) }}" class="btn btn-sm btn-primary">
+                                View Details
+                            </a>
                         </div>
                     </div>
-                    {% endfor %}
                 </div>
-            {% else %}
-                <div class="alert alert-info mb-0">
-                    <p class="mb-0">
-                        You haven't booked any treks yet! 
-                        <a href="{{ url_for('user.trek_listing') }}">Browse available treks</a> to get started.
-                    </p>
-                </div>
-            {% endif %}
-        </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="alert alert-info mb-0">
+                <p class="mb-0">
+                    You haven't booked any treks yet!
+                    <a href="{{ url_for('user.trek_listing') }}">Browse available treks</a> to get started.
+                </p>
+            </div>
+        {% endif %}
     </div>
+</div>
 
-    <!-- Quick Links -->
-    <div class="row mb-4">
-        <div class="col-md-6">
-            <a href="{{ url_for('user.trek_listing') }}" class="btn btn-primary btn-lg w-100 mb-2">
-                Browse Treks
-            </a>
-        </div>
-        <div class="col-md-6">
-            <a href="{{ url_for('user.booking_history') }}" class="btn btn-secondary btn-lg w-100 mb-2">
-                Booking History
-            </a>
-        </div>
+<!-- Quick Links -->
+<div class="row g-3 mb-4">
+    <div class="col-12 col-md-6">
+        <a href="{{ url_for('user.trek_listing') }}" class="btn btn-primary btn-lg w-100">
+            Browse Treks
+        </a>
+    </div>
+    <div class="col-12 col-md-6">
+        <a href="{{ url_for('user.booking_history') }}" class="btn btn-secondary btn-lg w-100">
+            Booking History
+        </a>
     </div>
 </div>
 {% endblock %}
