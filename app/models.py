@@ -54,6 +54,19 @@ class Booking(db.Model):
     updated_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc), onupdate=lambda: datetime.now(timezone.utc))
 
 
+def complete_active_bookings_for_trek(trek_id):
+    """
+    When a trek is marked Completed, every active Booked reservation should
+    move to Completed so trekking history reflects the finished trek.
+    """
+    active_bookings = Booking.query.filter_by(
+        trek_id=trek_id,
+        booking_status='Booked'
+    ).all()
+    for booking in active_bookings:
+        booking.booking_status = 'Completed'
+
+
 class StaffProfile(db.Model):
     __tablename__ = 'staff_profiles'
 

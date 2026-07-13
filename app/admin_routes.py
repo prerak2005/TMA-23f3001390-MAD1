@@ -1,10 +1,35 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash
 from flask_login import login_required
-from app.models import User, Trek, Booking, StaffProfile
+from app.models import User, Trek, Booking, StaffProfile, complete_active_bookings_for_trek
 from app import db
 from datetime import datetime, timezone
 
 admin = Blueprint('admin', __name__, url_prefix='/admin')
+
+# Admin trek lifecycle — each stage may only move forward (no skipping or backtracking)
+ADMIN_TREK_TRANSITIONS = {
+    'Pending': ['Approved'],
+    'Approved': ['Open'],
+    'Open': ['Closed', 'Completed'],
+    'Closed': ['Completed'],
+    'Completed': [],
+}
+
+_TREK_STATUS_TITLE = {
+    'pending': 'Pending',
+    'approved': 'Approved',
+    'open': 'Open',
+    'closed': 'Closed',
+    'completed': 'Completed',
+}
+
+
+def _normalize_trek_status(status):
+    """Match Title Case stored by seeds/admin even if legacy rows differ in casing."""
+    if not status:
+        return status
+    return _TREK_STATUS_TITLE.get(status.lower(), status)
+
 
 @admin.route('/dashboard')
 @login_required
@@ -271,9 +296,22 @@ def update_trek_status(trek_id, new_status):
     if new_status not in valid_responses:
         flash('Invalid Status!', 'danger')
         return redirect(url_for('admin.manage_treks'))
+
+    current_status = _normalize_trek_status(trek.status)
+    allowed_next = ADMIN_TREK_TRANSITIONS.get(current_status, [])
+    if new_status not in allowed_next:
+        allowed_label = ', '.join(allowed_next) if allowed_next else 'None (final state)'
+        flash(
+            f'Invalid status transition: {current_status} → {new_status}. Allowed: {allowed_label}',
+            'danger'
+        )
+        return redirect(url_for('admin.manage_treks'))
     
     try:
         trek.status = new_status
+        # Trek completion closes out every still-active booking for this trek
+        if new_status == 'Completed':
+            complete_active_bookings_for_trek(trek_id)
         db.session.commit()
         flash(f'Trek "{trek.name}" status changed to {new_status}', 'success')
     except Exception as e:
@@ -490,11 +528,15 @@ def cancel_booking(booking_id):
     if booking.booking_status == 'Cancelled':
         flash('This booking is already cancelled!', 'warning')
         return redirect(url_for('admin.manage_bookings'))
+
+    if booking.booking_status != 'Booked':
+        flash(f'Cannot cancel a {booking.booking_status} booking.', 'warning')
+        return redirect(url_for('admin.manage_bookings'))
     
     try:
         booking.booking_status = 'Cancelled'
         
-        # Return slots to trek
+        # Only Booked reservations consumed a slot — Completed/Cancelled must not refund again
         trek = Trek.query.get(booking.trek_id)
         trek.available_slots += 1
         

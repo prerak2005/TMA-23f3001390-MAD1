@@ -1,7 +1,7 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash, abort
 from flask_login import login_required, current_user
 from app import db
-from app.models import Trek, Booking, User, StaffProfile
+from app.models import Trek, Booking, User, StaffProfile, complete_active_bookings_for_trek
 from datetime import datetime
 
 staff = Blueprint('staff', __name__, url_prefix='/staff')
@@ -241,6 +241,9 @@ def update_trek_status(trek_id):
     # Persist Title Case so admin UI and user booking checks stay consistent
     try:
         trek.status = new_status
+        # Same cascade as admin — finishing a trek marks active bookings Completed
+        if new_status == 'Completed':
+            complete_active_bookings_for_trek(trek_id)
         db.session.commit()
         flash(f"Trek status updated to {new_status}", "success")
     except Exception as e:
