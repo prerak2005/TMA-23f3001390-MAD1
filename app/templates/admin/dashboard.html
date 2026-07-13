@@ -68,39 +68,47 @@
 
         <div class="mb-3">
             <h6 class="text-muted">Trek Management</h6>
-            <a href="{{ url_for('admin.manage_treks') }}" class="btn btn-primary btn-sm">
-                <i class="bi bi-mountain"></i> Manage Treks
-            </a>
-            <a href="{{ url_for('admin.create_trek') }}" class="btn btn-success btn-sm">
-                <i class="bi bi-plus-circle"></i> Create Trek
-            </a>
+            <div class="d-flex flex-wrap gap-2">
+                <a href="{{ url_for('admin.manage_treks') }}" class="btn btn-primary btn-sm">
+                    <i class="bi bi-mountain"></i> Manage Treks
+                </a>
+                <a href="{{ url_for('admin.create_trek') }}" class="btn btn-success btn-sm">
+                    <i class="bi bi-plus-circle"></i> Create Trek
+                </a>
+            </div>
         </div>
 
         <div class="mb-3">
             <h6 class="text-muted">Staff Management</h6>
-            <a href="{{ url_for('admin.view_pending_staff') }}" class="btn btn-warning btn-sm">
-                <i class="bi bi-clock-history"></i> Pending Approvals
-                {% if stats.pending_staff > 0 %}
-                    <span class="badge bg-danger">{{ stats.pending_staff }}</span>
-                {% endif %}
-            </a>
-            <a href="{{ url_for('admin.view_all_staff') }}" class="btn btn-info btn-sm">
-                <i class="bi bi-people"></i> View All Staff
-            </a>
+            <div class="d-flex flex-wrap gap-2">
+                <a href="{{ url_for('admin.view_pending_staff') }}" class="btn btn-warning btn-sm">
+                    <i class="bi bi-clock-history"></i> Pending Approvals
+                    {% if stats.pending_staff > 0 %}
+                        <span class="badge bg-danger">{{ stats.pending_staff }}</span>
+                    {% endif %}
+                </a>
+                <a href="{{ url_for('admin.view_all_staff') }}" class="btn btn-info btn-sm">
+                    <i class="bi bi-people"></i> View All Staff
+                </a>
+            </div>
         </div>
 
         <div class="mb-3">
             <h6 class="text-muted">User Management</h6>
-            <a href="{{ url_for('admin.manage_users') }}" class="btn btn-success btn-sm">
-                <i class="bi bi-people"></i> Manage Users
-            </a>
+            <div class="d-flex flex-wrap gap-2">
+                <a href="{{ url_for('admin.manage_users') }}" class="btn btn-success btn-sm">
+                    <i class="bi bi-people"></i> Manage Users
+                </a>
+            </div>
         </div>
 
         <div class="mb-3">
             <h6 class="text-muted">Booking Management</h6>
-            <a href="{{ url_for('admin.manage_bookings') }}" class="btn btn-info btn-sm">
-                <i class="bi bi-calendar2-event"></i> View Bookings
-            </a>
+            <div class="d-flex flex-wrap gap-2">
+                <a href="{{ url_for('admin.manage_bookings') }}" class="btn btn-info btn-sm">
+                    <i class="bi bi-calendar2-event"></i> View Bookings
+                </a>
+            </div>
         </div>
     </div>
 </div>

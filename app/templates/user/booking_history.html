@@ -5,14 +5,9 @@
 {% block content %}
 <div class="container mt-5">
     <div class="row mb-4">
-        <div class="col-md-8">
+        <div class="col-12">
             <h1>Booking History</h1>
-            <p class="text-muted">View all your trek bookings</p>
-        </div>
-        <div class="col-md-4 text-end">
-            <a href="{{ url_for('user.dashboard') }}" class="btn btn-outline-secondary">
-                ← Back to Dashboard
-            </a>
+            <p class="text-muted mb-0">View all your trek bookings</p>
         </div>
     </div>
 
@@ -112,9 +107,6 @@
     <div class="mt-4">
         <a href="{{ url_for('user.trek_listing') }}" class="btn btn-primary">
            ← Browse More Treks
-        </a>
-        <a href="{{ url_for('user.dashboard') }}" class="btn btn-secondary">
-            ← Back to Dashboard
         </a>
     </div>
 </div>

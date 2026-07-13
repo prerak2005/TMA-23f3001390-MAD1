@@ -7,15 +7,12 @@
 
     <h1 class="mb-4">Pending Staff Approvals</h1>
 
-    <!-- Back Button -->
-    <a href="{{ url_for('admin.dashboard') }}" class="btn btn-secondary mb-3">
-        ← Back to Dashboard
-    </a>
-
-    <!-- Link to view all staff -->
-    <a href="{{ url_for('admin.view_all_staff') }}" class="btn btn-info mb-3">
-        View All Staff
-    </a>
+    <!-- Navigation -->
+    <div class="d-flex flex-wrap gap-2 mb-4">
+        <a href="{{ url_for('admin.view_all_staff') }}" class="btn btn-info">
+            View All Staff
+        </a>
+    </div>
 
     <!-- Pending Staff Table -->
     {% if pending_profiles %}

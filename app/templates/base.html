@@ -12,11 +12,40 @@
 
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
     <div class="container">
-        <a class="navbar-brand" href="/"> TMA</a>
-        <div class="ms-auto">
+        <a class="navbar-brand" href="/">TMA</a>
+        <button
+            class="navbar-toggler"
+            type="button"
+            data-bs-toggle="collapse"
+            data-bs-target="#mainNavbar"
+            aria-controls="mainNavbar"
+            aria-expanded="false"
+            aria-label="Toggle navigation"
+        >
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="mainNavbar">
             {% if current_user.is_authenticated %}
-                <!-- User Info + Dropdown Menu -->
-                <div class="dropdown">
+                {% if current_user.role == 'admin' %}
+                    {% set dashboard_endpoint = 'admin.dashboard' %}
+                {% elif current_user.role == 'staff' %}
+                    {% set dashboard_endpoint = 'staff.dashboard' %}
+                {% else %}
+                    {% set dashboard_endpoint = 'user.dashboard' %}
+                {% endif %}
+            {% endif %}
+            <ul class="navbar-nav me-auto">
+                {% if current_user.is_authenticated %}
+                <li class="nav-item">
+                    <a class="nav-link{% if request.endpoint == dashboard_endpoint %} active{% endif %}" href="{{ url_for(dashboard_endpoint) }}">
+                        Dashboard
+                    </a>
+                </li>
+                {% endif %}
+            </ul>
+            <ul class="navbar-nav ms-auto align-items-lg-center">
+            {% if current_user.is_authenticated %}
+                <li class="nav-item dropdown">
                     <button 
                         class="btn btn-outline-light btn-sm dropdown-toggle" 
                         type="button" 
@@ -24,7 +53,7 @@
                         data-bs-toggle="dropdown" 
                         aria-expanded="false"
                     >
-                         {{ current_user.name }}
+                        {{ current_user.name }}
                     </button>
                     
                     <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
@@ -59,10 +88,13 @@
                         <li><hr class="dropdown-divider"></li>
                         <li><a class="dropdown-item text-danger" href="{{ url_for('auth.logout') }}">Logout</a></li>
                     </ul>
-                </div>
+                </li>
             {% else %}
-                <a href="{{ url_for('auth.login') }}" class="btn btn-outline-light btn-sm me-2">Login</a>
+                <li class="nav-item">
+                    <a href="{{ url_for('auth.login') }}" class="btn btn-outline-light btn-sm">Login</a>
+                </li>
             {% endif %}
+            </ul>
         </div>
     </div>
 </nav>
@@ -78,6 +110,21 @@
             {% endfor %}
         {% endif %}
     {% endwith %}
+
+    {% if current_user.is_authenticated %}
+        {% if current_user.role == 'admin' %}
+            {% set dashboard_endpoint = 'admin.dashboard' %}
+        {% elif current_user.role == 'staff' %}
+            {% set dashboard_endpoint = 'staff.dashboard' %}
+        {% else %}
+            {% set dashboard_endpoint = 'user.dashboard' %}
+        {% endif %}
+        {% if request.endpoint != dashboard_endpoint %}
+        <a href="{{ url_for(dashboard_endpoint) }}" class="btn btn-outline-secondary btn-sm mb-3">
+            <i class="bi bi-house-door"></i> Back to Dashboard
+        </a>
+        {% endif %}
+    {% endif %}
 
     {% block content %}{% endblock %}
 </div>
