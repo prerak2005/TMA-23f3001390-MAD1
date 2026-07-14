@@ -41,6 +41,8 @@ def dashboard():
     total_staff = User.query.filter_by(role='staff').count()
     total_treks = Trek.query.count()
     total_bookings = Booking.query.count()
+    # lowercase 'active' matches User.status convention (not Title Case)
+    active_users = User.query.filter_by(role='trekker', status='active').count()
 
     # pending staff approvals
     pending_staff = StaffProfile.query.filter_by(status='pending').count()
@@ -57,7 +59,16 @@ def dashboard():
         # 'pending_treks' : pending_treks
     }
 
-    return render_template('admin/dashboard.html', stats=stats)
+    overview_chart = {
+        'labels': ['Treks', 'Bookings', 'Active Users'],
+        'data': [total_treks, total_bookings, active_users],
+    }
+
+    return render_template(
+        'admin/dashboard.html',
+        stats=stats,
+        overview_chart=overview_chart,
+    )
 
 
 @admin.route('/trekk/create', methods=['GET', 'POST'])
