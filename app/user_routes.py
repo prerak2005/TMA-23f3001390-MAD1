@@ -1,5 +1,6 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash, abort
 from flask_login import login_required, current_user
+from sqlalchemy import func
 from app import db
 from app.models import Trek, Booking, User, StaffProfile
 from datetime import datetime, timezone
@@ -23,10 +24,40 @@ def dashboard():
         if booking.trek.start_date and booking.trek.start_date > today
     )
 
+    # History doughnut: all bookings grouped by Title Case booking_status
+    history_rows = (
+        db.session.query(Booking.booking_status, func.count(Booking.id))
+        .filter(Booking.user_id == current_user.id)
+        .group_by(Booking.booking_status)
+        .all()
+    )
+    history_chart = {
+        'labels': [status for status, _ in history_rows],
+        'data': [count for _, count in history_rows],
+    }
+
+    # Trend line: bookings per month (all statuses — activity over time)
+    trend_rows = (
+        db.session.query(
+            func.strftime('%Y-%m', Booking.booking_date).label('month'),
+            func.count(Booking.id),
+        )
+        .filter(Booking.user_id == current_user.id)
+        .group_by('month')
+        .order_by('month')
+        .all()
+    )
+    trend_chart = {
+        'labels': [month for month, _ in trend_rows if month],
+        'data': [count for month, count in trend_rows if month],
+    }
+
     return render_template(
         'user/dashboard.html',
         user_bookings=user_bookings,
-        upcoming_treks=upcoming_treks
+        upcoming_treks=upcoming_treks,
+        history_chart=history_chart,
+        trend_chart=trend_chart,
     )
 
 
