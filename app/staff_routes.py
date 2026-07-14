@@ -79,14 +79,21 @@ def dashboard():
     open_treks = sum(1 for t in assigned_treks if t.status == 'Open')
     closed_treks = sum(1 for t in assigned_treks if t.status == 'Closed')
     total_participants = sum(data['participant_count'] for data in trek_data)
-    
+
+    # Chart payload from existing trek_data (Booked counts already computed above)
+    participant_chart = {
+        'labels': [d['trek'].name for d in trek_data],
+        'data': [d['participant_count'] for d in trek_data],
+    }
+
     return render_template(
         'staff/dashboard.html',
         trek_data=trek_data,
         total_treks=total_treks,
         open_treks=open_treks,
         closed_treks=closed_treks,
-        total_participants=total_participants
+        total_participants=total_participants,
+        participant_chart=participant_chart,
         )
 
 
