@@ -1,0 +1,566 @@
+openapi: 3.0.3
+info:
+  title: Trekking Management Application (TMA) API
+  description: |
+    Resource endpoints for the Trekking Management Application.
+    The app primarily uses form-based Flask routes with session authentication
+    (Flask-Login). Endpoints below document the main HTTP resources exposed
+    by the application.
+  version: 1.0.0
+
+servers:
+  - url: http://127.0.0.1:5000
+    description: Local development server
+
+tags:
+  - name: Auth
+  - name: Admin
+  - name: Staff
+  - name: Trekker
+
+paths:
+  /login:
+    get:
+      tags: [Auth]
+      summary: Render login page
+      responses:
+        '200':
+          description: Login form HTML
+    post:
+      tags: [Auth]
+      summary: Authenticate user and create session
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              required: [email, password]
+              properties:
+                email:
+                  type: string
+                  format: email
+                password:
+                  type: string
+                  format: password
+      responses:
+        '302':
+          description: Redirect to role-specific dashboard on success
+        '200':
+          description: Login page re-rendered with flash error
+
+  /register/trekker:
+    get:
+      tags: [Auth]
+      summary: Render trekker registration page
+      responses:
+        '200':
+          description: Registration form HTML
+    post:
+      tags: [Auth]
+      summary: Register a new trekker account
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              required: [name, email, password, confirm_password]
+              properties:
+                name:
+                  type: string
+                email:
+                  type: string
+                  format: email
+                contact_number:
+                  type: string
+                whatsapp_number:
+                  type: string
+                password:
+                  type: string
+                confirm_password:
+                  type: string
+      responses:
+        '302':
+          description: Redirect to login after successful registration
+
+  /register/staff:
+    get:
+      tags: [Auth]
+      summary: Render staff registration page
+      responses:
+        '200':
+          description: Registration form HTML
+    post:
+      tags: [Auth]
+      summary: Register staff (pending admin approval)
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              required: [name, email, password, confirm_password, specialization, experience]
+              properties:
+                name:
+                  type: string
+                email:
+                  type: string
+                contact_number:
+                  type: string
+                whatsapp_number:
+                  type: string
+                password:
+                  type: string
+                confirm_password:
+                  type: string
+                specialization:
+                  type: string
+                experience:
+                  type: integer
+      responses:
+        '302':
+          description: Redirect to login; staff awaits admin approval
+
+  /logout:
+    get:
+      tags: [Auth]
+      summary: End user session
+      responses:
+        '302':
+          description: Redirect to login page
+
+  /admin/dashboard:
+    get:
+      tags: [Admin]
+      summary: Admin dashboard with stats and overview charts
+      responses:
+        '200':
+          description: Dashboard HTML with trek/booking/user statistics
+
+  /admin/trekk/create:
+    get:
+      tags: [Admin]
+      summary: Render create-trek form
+      responses:
+        '200':
+          description: Create trek form HTML
+    post:
+      tags: [Admin]
+      summary: Create a new trek
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                location:
+                  type: string
+                difficulty:
+                  type: string
+                  enum: [Easy, Moderate, Hard]
+                duration:
+                  type: integer
+                total_slots:
+                  type: integer
+                assigned_staff_id:
+                  type: integer
+                start_date:
+                  type: string
+                  format: date
+                end_date:
+                  type: string
+                  format: date
+      responses:
+        '302':
+          description: Redirect after trek creation
+
+  /admin/treks:
+    get:
+      tags: [Admin]
+      summary: List and manage all treks
+      responses:
+        '200':
+          description: Trek management page HTML
+
+  /admin/trek/{trek_id}/edit:
+    get:
+      tags: [Admin]
+      summary: Render edit-trek form
+      parameters:
+        - $ref: '#/components/parameters/TrekId'
+      responses:
+        '200':
+          description: Edit trek form HTML
+    post:
+      tags: [Admin]
+      summary: Update trek details
+      parameters:
+        - $ref: '#/components/parameters/TrekId'
+      responses:
+        '302':
+          description: Redirect after update
+
+  /admin/trek/{trek_id}/delete-confirm:
+    get:
+      tags: [Admin]
+      summary: Confirm trek deletion
+      parameters:
+        - $ref: '#/components/parameters/TrekId'
+      responses:
+        '200':
+          description: Delete confirmation page
+    post:
+      tags: [Admin]
+      summary: Delete a trek
+      parameters:
+        - $ref: '#/components/parameters/TrekId'
+      responses:
+        '302':
+          description: Redirect after deletion
+
+  /admin/trek/{trek_id}/status/{new_status}:
+    post:
+      tags: [Admin]
+      summary: Advance trek lifecycle status
+      description: |
+        Allowed forward transitions only:
+        Pending → Approved → Open → Closed|Completed; Closed → Completed.
+      parameters:
+        - $ref: '#/components/parameters/TrekId'
+        - name: new_status
+          in: path
+          required: true
+          schema:
+            type: string
+            enum: [Approved, Open, Closed, Completed]
+      responses:
+        '302':
+          description: Redirect after status update
+
+  /admin/staff/pending:
+    get:
+      tags: [Admin]
+      summary: List staff pending approval
+      responses:
+        '200':
+          description: Pending staff list HTML
+
+  /admin/staff/approve/{user_id}:
+    post:
+      tags: [Admin]
+      summary: Approve a staff registration
+      parameters:
+        - $ref: '#/components/parameters/UserId'
+      responses:
+        '302':
+          description: Redirect after approval
+
+  /admin/staff/reject/{user_id}:
+    post:
+      tags: [Admin]
+      summary: Reject a staff registration
+      parameters:
+        - $ref: '#/components/parameters/UserId'
+      responses:
+        '302':
+          description: Redirect after rejection
+
+  /admin/staff/all:
+    get:
+      tags: [Admin]
+      summary: View all staff members
+      responses:
+        '200':
+          description: Staff directory HTML
+
+  /admin/users:
+    get:
+      tags: [Admin]
+      summary: Manage trekker accounts
+      responses:
+        '200':
+          description: User management page HTML
+
+  /admin/user/{user_id}/toggle-status:
+    post:
+      tags: [Admin]
+      summary: Toggle trekker active/blacklisted status
+      parameters:
+        - $ref: '#/components/parameters/UserId'
+      responses:
+        '302':
+          description: Redirect after status toggle
+
+  /admin/bookings:
+    get:
+      tags: [Admin]
+      summary: View and manage all bookings
+      responses:
+        '200':
+          description: Bookings management page HTML
+
+  /admin/booking/{booking_id}/cancel:
+    post:
+      tags: [Admin]
+      summary: Cancel a booking (admin)
+      parameters:
+        - $ref: '#/components/parameters/BookingId'
+      responses:
+        '302':
+          description: Redirect after cancellation
+
+  /staff/dashboard:
+    get:
+      tags: [Staff]
+      summary: Staff dashboard for assigned treks
+      responses:
+        '200':
+          description: Staff dashboard HTML
+        '403':
+          description: Forbidden if not staff
+
+  /staff/trek/{trek_id}:
+    get:
+      tags: [Staff]
+      summary: View assigned trek details and participants
+      parameters:
+        - $ref: '#/components/parameters/TrekId'
+      responses:
+        '200':
+          description: Trek details HTML
+        '404':
+          description: Trek not found or not assigned to this staff
+
+  /staff/trek/{trek_id}/update-slots:
+    post:
+      tags: [Staff]
+      summary: Update available slots for an assigned trek
+      parameters:
+        - $ref: '#/components/parameters/TrekId'
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                available_slots:
+                  type: integer
+      responses:
+        '302':
+          description: Redirect after slot update
+
+  /staff/trek/{trek_id}/update-status:
+    post:
+      tags: [Staff]
+      summary: Update status of an assigned trek
+      parameters:
+        - $ref: '#/components/parameters/TrekId'
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                status:
+                  type: string
+                  enum: [Open, Closed, Completed]
+      responses:
+        '302':
+          description: Redirect after status update
+
+  /staff/trek/{trek_id}/remove-participant/{booking_id}:
+    post:
+      tags: [Staff]
+      summary: Remove a participant from an assigned trek
+      parameters:
+        - $ref: '#/components/parameters/TrekId'
+        - $ref: '#/components/parameters/BookingId'
+      responses:
+        '302':
+          description: Redirect after participant removal
+
+  /user/dashboard:
+    get:
+      tags: [Trekker]
+      summary: Trekker dashboard with bookings and charts
+      responses:
+        '200':
+          description: User dashboard HTML with history and trend charts
+
+  /user/treks:
+    get:
+      tags: [Trekker]
+      summary: List open treks available for booking
+      parameters:
+        - name: search
+          in: query
+          required: false
+          schema:
+            type: string
+          description: Case-insensitive trek name filter
+      responses:
+        '200':
+          description: Trek listing HTML
+
+  /user/trek/{id}:
+    get:
+      tags: [Trekker]
+      summary: View trek details before booking
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Trek details HTML
+
+  /user/book-trek/{trek_id}:
+    post:
+      tags: [Trekker]
+      summary: Book a seat on an open trek
+      parameters:
+        - $ref: '#/components/parameters/TrekId'
+      responses:
+        '302':
+          description: Redirect to booking confirmation or listing with flash
+
+  /user/booking-confirmation/{booking_id}:
+    get:
+      tags: [Trekker]
+      summary: Show booking confirmation
+      parameters:
+        - $ref: '#/components/parameters/BookingId'
+      responses:
+        '200':
+          description: Confirmation page HTML
+
+  /user/booking-history:
+    get:
+      tags: [Trekker]
+      summary: View trekker booking history
+      responses:
+        '200':
+          description: Booking history HTML
+
+  /user/cancel-booking/{booking_id}:
+    post:
+      tags: [Trekker]
+      summary: Cancel an active booking
+      parameters:
+        - $ref: '#/components/parameters/BookingId'
+      responses:
+        '302':
+          description: Redirect after cancellation
+
+components:
+  parameters:
+    TrekId:
+      name: trek_id
+      in: path
+      required: true
+      schema:
+        type: integer
+    UserId:
+      name: user_id
+      in: path
+      required: true
+      schema:
+        type: integer
+    BookingId:
+      name: booking_id
+      in: path
+      required: true
+      schema:
+        type: integer
+
+  schemas:
+    User:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        email:
+          type: string
+        contact_number:
+          type: string
+        whatsapp_number:
+          type: string
+        role:
+          type: string
+          enum: [admin, staff, trekker]
+        status:
+          type: string
+          enum: [active, blacklisted]
+    Trek:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        location:
+          type: string
+        difficulty:
+          type: string
+          enum: [Easy, Moderate, Hard]
+        duration:
+          type: integer
+          description: Duration in days
+        total_slots:
+          type: integer
+        available_slots:
+          type: integer
+        assigned_staff_id:
+          type: integer
+          nullable: true
+        status:
+          type: string
+          enum: [Pending, Approved, Open, Closed, Completed]
+        start_date:
+          type: string
+          format: date
+        end_date:
+          type: string
+          format: date
+    Booking:
+      type: object
+      properties:
+        id:
+          type: integer
+        user_id:
+          type: integer
+        trek_id:
+          type: integer
+        booking_date:
+          type: string
+          format: date-time
+        booking_status:
+          type: string
+          enum: [Booked, Cancelled, Completed]
+        payment_status:
+          type: string
+          enum: [Pending, Paid]
+    StaffProfile:
+      type: object
+      properties:
+        id:
+          type: integer
+        user_id:
+          type: integer
+        specialization:
+          type: string
+        experience:
+          type: integer
+          description: Years of experience
+        status:
+          type: string
+        approved_by_admin:
+          type: boolean
